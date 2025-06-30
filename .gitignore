@@ -1,0 +1,11 @@
+#.gitignore
+.vscode/
+dep/
+obj/
+*.o
+*.d
+a.out
+libft.a
+libftprintf.a
+program
+fdf
