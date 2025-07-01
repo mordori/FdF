@@ -1,28 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   fdf.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/30 17:16:56 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/06/30 17:40:16 by myli-pen         ###   ########.fr       */
+/*   Created: 2025/07/01 22:37:25 by myli-pen          #+#    #+#             */
+/*   Updated: 2025/07/02 01:50:13 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft/libft.h"
-#include "MLX42/MLX42.h"
+#ifndef FDF_H
+# define FDF_H
 
-int	main(int argc, char *argv[])
-{
+//# include "libft.h"
+# include "MLX42.h"
 
-	// if (argc == 2)
-	// {
-
-	// }
-	// else
-	// {
-
-	// }
-	return (0);
-}
+#endif

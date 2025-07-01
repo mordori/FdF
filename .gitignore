@@ -2,6 +2,7 @@
 .vscode/
 dep/
 obj/
+lib/
 *.o
 *.d
 a.out
