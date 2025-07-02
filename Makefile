@@ -6,10 +6,9 @@
 #    By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/30 16:50:13 by myli-pen          #+#    #+#              #
-#    Updated: 2025/07/02 01:53:09 by myli-pen         ###   ########.fr        #
+#    Updated: 2025/07/02 20:04:46 by myli-pen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
-
 
 MAKEFLAGS	+= --no-print-directory
 NAME		=fdf
@@ -26,12 +25,14 @@ LDFLAGS		=-ldl -lglfw -pthread -lm
 
 DIR_LIBFT	=$(DIR_LIB)libft/
 DIR_MLX		=$(DIR_LIB)MLX42/
+DIR_INC		=include/
 DIR_SRC		=src/
 DIR_OBJ		=obj/
 DIR_LIB		=lib/
 DIR_DEP		=dep/
 
-HEADERS		=-I include/ -I $(DIR_LIBFT)include/ -I $(DIR_MLX)include/
+HEADERS		=$(addprefix -I , \
+				$(DIR_INC) $(DIR_LIBFT)$(DIR_INC) $(DIR_MLX)$(DIR_INC)MLX42/)
 SRCS		=$(addprefix $(DIR_SRC), \
 				fdf.c)
 OBJS		=$(patsubst $(DIR_SRC)%.c, $(DIR_OBJ)%.o, $(SRCS))
@@ -43,21 +44,23 @@ GREEN		=\033[1;32m
 RED			=\033[1;31m
 COLOR		=\033[0m
 
-all: $(DIR_LIB) $(LIBFT) $(MLX42) $(NAME)
+all: $(DIR_OBJ) $(LIBFT) $(MLX42) $(NAME)
 
-$(DIR_LIB):
+$(DIR_OBJ):
 	@mkdir -p $(DIR_LIB) $(DIR_OBJ) $(DIR_DEP)
+	@echo "$(GREEN) [+]$(COLOR) added missing directories"
 
 $(LIBFT):
 	@if [ ! -d "$(DIR_LIBFT)" ]; \
-	then echo "$(BLUE) [~] cloning $(URL_LIBFT)$(COLOR)"; \
+	then echo "$(BLUE) [~]$(COLOR) cloning to lib/ $(BLUE)$(URL_LIBFT)$(COLOR)"; \
 	git clone --quiet $(URL_LIBFT) $(DIR_LIBFT); \
 	fi
+	@echo "$(GREEN) [+]$(COLOR) compiling libft.a"
 	@make -C $(DIR_LIBFT)
 
 $(MLX42):
 	@if [ ! -d "$(DIR_MLX)" ]; \
-	then echo "$(BLUE) [~] cloning $(URL_MLX)$(COLOR)"; \
+	then echo "$(BLUE) [~]$(COLOR) cloning to lib/ $(BLUE)$(URL_MLX)$(COLOR)"; \
 	git clone --quiet $(URL_MLX) $(DIR_MLX); \
 	fi
 	@echo "$(GREEN) [+]$(COLOR) compiling mlx42.a"
@@ -74,16 +77,19 @@ $(DIR_OBJ)%.o: $(DIR_SRC)%.c
 	@echo "$(GREEN) [+]$(COLOR) compiling $@"
 
 clean:
-	@rm -rf $(DIR_OBJ) $(DIR_DEP)
-	@echo "$(RED) [-]$(COLOR) removed $(DIR_OBJ)"
-	@echo "$(RED) [-]$(COLOR) removed $(DIR_DEP)"
-	@if [ -d "$(DIR_MLX)build" ]; then make -C $(DIR_MLX)build clean; fi
+	@if [ -d "$(DIR_OBJ)" ]; then rm -rf $(DIR_OBJ) $(DIR_DEP); \
+	echo "$(RED) [-]$(COLOR) removed $(DIR_OBJ)"; \
+	echo "$(RED) [-]$(COLOR) removed $(DIR_DEP)"; \
+	fi
 	@if [ -d "$(DIR_LIBFT)" ]; then make -C $(DIR_LIBFT) clean; fi
 
 fclean: clean
-	@rm -rf $(DIR_LIB) $(NAME)
-	@echo "$(RED) [-]$(COLOR) removed $(DIR_LIB)"
-	@echo "$(RED) [-]$(COLOR) removed $(NAME)"
+	@if [ -d "$(DIR_LIB)" ]; then rm -rf $(DIR_LIB); \
+	echo "$(RED) [-]$(COLOR) removed $(DIR_LIB)"; \
+	fi
+	@if [ -e "$(NAME)" ]; then rm -f $(NAME); \
+	echo "$(RED) [-]$(COLOR) removed $(NAME)"; \
+	fi
 
 re: fclean all
 

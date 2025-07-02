@@ -6,14 +6,22 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 22:37:25 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/02 01:50:13 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/02 19:05:03 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FDF_H
 # define FDF_H
 
-//# include "libft.h"
+# define WIDTH 512
+# define HEIGHT 512
+
+# include <stdlib.h>	// exit
+# include <stdio.h>		// perror
+# include <math.h>
+
 # include "MLX42.h"
+# include "libft_io.h"	// ft_printf, get_next_line, ft_split
+# include "libft_str.h"	// ft_split
 
 #endif
