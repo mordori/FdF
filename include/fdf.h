@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 22:37:25 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/02 19:05:03 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/09 12:11:49 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,5 +23,6 @@
 # include "MLX42.h"
 # include "libft_io.h"	// ft_printf, get_next_line, ft_split
 # include "libft_str.h"	// ft_split
+# include "libft_mem.h"	// ft_memset
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/02 18:57:45 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/09 13:19:52 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,26 +14,40 @@
 
 static inline void ft_error(void *param);
 static inline void ft_hook(void *param);
+void	ft_resize(void *param, mlx_image_t *img);
 
 int	main(void)
 {
-	mlx_t		*mlx;
-	mlx_image_t	*img;
+	mlx_t			*mlx;
+	mlx_image_t		*img;
+	//mlx_texture_t	*icon;
 
 	mlx_set_setting(MLX_MAXIMIZED, true);
-	mlx = mlx_init(WIDTH, HEIGHT, "42Balls", true);
-	ft_printf("WIDTH: %d | HEIGHT: %d\n", mlx->width, mlx->height);
+	mlx = mlx_init(WIDTH, HEIGHT, "FdF", true);
 	if (!mlx)
 		ft_error(mlx);
-	img  = mlx_new_image(mlx, 256, 256);
+	img  = mlx_new_image(mlx, mlx->width, mlx->height);
 	if (!img || (mlx_image_to_window(mlx, img, 0, 0) < 0))
 		ft_error(mlx);
-	mlx_put_pixel(img, 0, 0, 0xFF0000FF);
+	//icon = mlx_load_png("");
+	//mlx_set_icon(mlx, icon);
+	//mlx_put_pixel(img, 0, 0, 0xFF0000FF);
+	ft_memset(img->pixels, 0xFF0000FF, img->width * img->height * sizeof (int32_t));
+	//mlx_put_string(mlx, "Test", 0, 0);
 	mlx_loop_hook(mlx, ft_hook, mlx);
+	//mlx_resize_hook(mlx, ft_resize, img);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
 	return (EXIT_SUCCESS);
 }
+
+// void	ft_resize(void *param)
+// {
+// 	mlx_image_t	*img;
+
+// 	img = param;
+// 	mlx_resize_image(img, mlx_get_monitor_size())
+// }
 
 static inline void ft_error(void *param)
 {
@@ -50,7 +64,7 @@ static inline void ft_hook(void *param)
 	const mlx_t	*mlx;
 
 	mlx = param;
-	ft_printf("WIDTH: %d | HEIGHT: %d\n", mlx->width, mlx->height);
+
 }
 
 // void	fdf(char *file)
