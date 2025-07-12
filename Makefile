@@ -6,7 +6,7 @@
 #    By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/30 16:50:13 by myli-pen          #+#    #+#              #
-#    Updated: 2025/07/06 17:06:07 by myli-pen         ###   ########.fr        #
+#    Updated: 2025/07/12 02:07:25 by myli-pen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,8 +20,10 @@ LIBFT		=$(DIR_LIBFT)libft.a
 MLX42		=$(DIR_MLX)build/libmlx42.a
 
 CC			=cc
-CFLAGS		=-Wall -Wextra -Werror -Wunreachable-code -Wunused-result -O3
+#CFLAGS		=-Wall -Wextra -Werror -Wunreachable-code -O3
+CFLAGS		=-O3
 LDFLAGS		=-ldl -lglfw -pthread -lm
+VECTOR_SIZE	=1024
 
 DIR_LIBFT	=$(DIR_LIB)libft/
 DIR_MLX		=$(DIR_LIB)MLX42/
@@ -46,6 +48,9 @@ COLOR		=\033[0m
 
 all: $(DIR_OBJ) $(LIBFT) $(MLX42) $(NAME)
 
+libftclean:
+	make -C $(DIR_LIBFT) re;
+
 $(DIR_OBJ):
 	@mkdir -p $(DIR_LIB) $(DIR_OBJ) $(DIR_DEP)
 	@echo "$(GREEN) [+]$(COLOR) created missing directories"
@@ -56,7 +61,7 @@ $(LIBFT):
 		git clone --quiet $(URL_LIBFT) $(DIR_LIBFT); \
 	fi
 	@echo "$(GREEN) [+]$(COLOR) compiling libft.a"
-	@make -C $(DIR_LIBFT)
+	@make -C $(DIR_LIBFT) VECTOR_SIZE=8
 
 $(MLX42):
 	@if [ ! -d "$(DIR_MLX)" ]; then \
@@ -73,7 +78,7 @@ $(NAME): $(OBJS)
 	@echo "$(YELLOW) [✔] $(NAME) created$(COLOR)"
 
 $(DIR_OBJ)%.o: $(DIR_SRC)%.c
-	@$(CC) $(CFLAGS) -c $< -o $@ -MMD -MP -MF $(patsubst $(DIR_OBJ)%.o, $(DIR_DEP)%.d, $@) $(HEADERS)
+	@$(CC) $(CFLAGS) -c $< -o $@ -MMD -MP -MF $(patsubst $(DIR_OBJ)%.o, $(DIR_DEP)%.d, $@) $(HEADERS) -D VECTOR_SIZE=$(VECTOR_SIZE)
 	@echo "$(GREEN) [+]$(COLOR) compiling $@"
 
 clean:

@@ -6,22 +6,36 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/09 13:19:52 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/12 04:03:46 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-static inline void ft_error(void *param);
-static inline void ft_hook(void *param);
-void	ft_resize(void *param, mlx_image_t *img);
+static inline void	ft_error(void *param);
+int	parse_map(char *map, t_vector *vertices, t_vec2 *rows_cols);
+void	make_indices(t_vector *indices, t_vector *vertices, t_vec2 rows_cols);
+void	render(void *context);
+static inline void	render_line(t_render_context *ctx, int i1, int i2);
+static inline void	draw_line(mlx_image_t *img, t_vertex v0, t_vertex v1);
+static inline void	draw_pixel(mlx_image_t *img, t_vertex v0);
+t_vertex	proj_iso(t_vertex *v);
 
-int	main(void)
+int	main(int argc, char *argv[])
 {
-	mlx_t			*mlx;
-	mlx_image_t		*img;
-	//mlx_texture_t	*icon;
+	mlx_t				*mlx;
+	mlx_image_t			*img;
+	int					fd;
+	t_vector			vertices;
+	t_vector			indices;
+	t_vec2				rows_cols;
+	t_render_context	*ctx;
 
+	for (int fd = 3; fd < 1024; fd++)
+		close(fd);
+
+	if (argc != 2)
+		return (EXIT_FAILURE);
 	mlx_set_setting(MLX_MAXIMIZED, true);
 	mlx = mlx_init(WIDTH, HEIGHT, "FdF", true);
 	if (!mlx)
@@ -29,25 +43,36 @@ int	main(void)
 	img  = mlx_new_image(mlx, mlx->width, mlx->height);
 	if (!img || (mlx_image_to_window(mlx, img, 0, 0) < 0))
 		ft_error(mlx);
-	//icon = mlx_load_png("");
-	//mlx_set_icon(mlx, icon);
-	//mlx_put_pixel(img, 0, 0, 0xFF0000FF);
-	ft_memset(img->pixels, 0xFF0000FF, img->width * img->height * sizeof (int32_t));
-	//mlx_put_string(mlx, "Test", 0, 0);
-	mlx_loop_hook(mlx, ft_hook, mlx);
-	//mlx_resize_hook(mlx, ft_resize, img);
+
+	mlx_image_t *imag = mlx_put_string(mlx, "Reading map file...", mlx->width / 2, mlx->height / 3);
+	vector_init(&vertices, true);
+	fd = parse_map(argv[1], &vertices, &rows_cols);
+	if (fd == ERROR)
+		ft_error(mlx);
+	else
+		mlx_delete_image(mlx, imag);
+	vector_init(&indices, true);
+	make_indices(&indices, &vertices, rows_cols);
+	ctx = malloc(sizeof (t_render_context));
+	if (!ctx)
+		ft_error(mlx);
+	*ctx = (t_render_context)
+	{
+		.img = img,
+		.vertices = &vertices,
+		.indices = &indices,
+		.rows_cols = rows_cols,
+		.project = proj_iso
+	};
+	mlx_loop_hook(mlx, render, ctx);
+
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
+	close(fd);
+	vector_free(&indices);
+	vector_free(&vertices);
 	return (EXIT_SUCCESS);
 }
-
-// void	ft_resize(void *param)
-// {
-// 	mlx_image_t	*img;
-
-// 	img = param;
-// 	mlx_resize_image(img, mlx_get_monitor_size())
-// }
 
 static inline void ft_error(void *param)
 {
@@ -59,106 +84,152 @@ static inline void ft_error(void *param)
 	exit(EXIT_FAILURE);
 }
 
-static inline void ft_hook(void *param)
+int	parse_map(char *map, t_vector *vertices, t_vec2 *rows_cols)
 {
-	const mlx_t	*mlx;
+	char		*line;
+	char		**elements;
+	char		**data;
+	int			fd;
+	int			i;
+	t_vertex	vertex;
 
-	mlx = param;
-
+	fd = open(map, O_RDONLY);
+	if (fd == ERROR)
+		return (ERROR);
+	line = get_next_line(fd);
+	if (!line)
+		return (ERROR);
+	(*rows_cols).x = 0;
+	while (line)
+	{
+		elements = ft_split(line, ' ');
+		if (!elements)
+			return (ERROR);
+		i = 0;
+		while (elements[i])
+		{
+			data = ft_split(elements[i], ',');
+			if (!data)
+				return (ERROR);
+			vertex.pos.z = ft_atoi(data[0]);
+			if (data[1])
+			{
+				char *color = ft_strtrim(data[1], "0x");
+				ft_striteri(color, ft_toupper);
+				vertex.color = (uint32_t)ft_atoi_base(color, BASE_16);
+			}
+			else
+				vertex.color = WHITE;
+			vector_add(vertices, &vertex);
+			++i;
+		}
+		(*rows_cols).y = i;
+		(*rows_cols).x++;
+		line = get_next_line(fd);
+	}
+	// ERROR MAP
+	// strcmp
+	return (fd);
 }
 
-// void	fdf(char *file)
-// {
+void	make_indices(t_vector *indices, t_vector *vertices, t_vec2 rows_cols)
+{
+	size_t	i;
+	t_vec3	index;
 
-// }
+	i = 0;
+	while (i < (rows_cols.x - 1) * ((rows_cols.y - 1) * 2))
+	{
+		index.x = i + i / (rows_cols.y - 1) - (i / 2) / (rows_cols.y - 1);
+		index.y = rows_cols.y + i % (rows_cols.y - 1) + i / (rows_cols.y - 1);
+		index.z = (i + 1) % (rows_cols.y) + i / (rows_cols.y - 1);
+		vector_add(indices, &index);
+		printf("%d %d %d\n", index.x, index.y, index.z);
+		++i;
+	}
+}
 
-// void	parse_file(char *file)
-// {
+void	render(void *context)
+{
+	size_t				i;
+	t_vec3				index;
+	t_render_context	*ctx;
 
-// }
+	i = 0;
+	ctx = (t_render_context *)context;
+	while (i < ctx->indices->total)
+	{
+		index = *(t_vec3 *)(vector_get(ctx->indices, i));
+		if (index.z > 0)
+			render_line(ctx, index.x, index.z);
+		if (index.y > 0)
+			render_line(ctx, index.x, index.y);
+		// if (index->y > 0 && index->z > 0)
+		// 	render_line(ctx, (*index).y, (*index).z);
+		++i;
+	}
+}
 
-// void	render_lines()
-// {
-	//int argc, char *argv[]
-// }
+static inline void	render_line(t_render_context *ctx, int i1, int i2)
+{
+	t_vertex	v0;
+	t_vertex	v1;
+	t_vec2		offset;
 
+	offset.x = ctx->img->width / 2;
+	offset.y = 50;
+	v0 = ctx->project(vector_get(ctx->vertices, i1));
+	v0.pos.x += offset.x;
+	v0.pos.y += offset.y;
+	v1 = ctx->project(vector_get(ctx->vertices, i2));
+	v1.pos.x += offset.x;
+	v1.pos.y += offset.y;
+	draw_line(ctx->img, v0, v1);
+}
 
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <stdbool.h>
+static inline void	draw_line(mlx_image_t *img, t_vertex v0, t_vertex v1)
+{
+	t_vec2	d;
+	t_vec2	s;
+	t_vec2	error;
 
-// static mlx_image_t* image;
+	d.x = abs(v1.pos.x - v0.pos.x);
+	d.y = -abs(v1.pos.y - v0.pos.y);
+	s.x = 1 + (-2 * (v0.pos.x >= v1.pos.x));
+	s.y = 1 + (-2 * (v0.pos.y >= v1.pos.y));
+	error.x = d.x + d.y;
+	while (v0.pos.x != v1.pos.x || v0.pos.y != v1.pos.y)
+	{
+		draw_pixel(img, v0);
+		error.y = 2 * error.x;
+		if (error.y >= d.y)
+		{
+			error.x += d.y;
+			v0.pos.x += s.x;
+		}
+		if (error.y <= d.x)
+		{
+			error.x += d.x;
+			v0.pos.y += s.y;
+		}
+	}
+	draw_pixel(img, v0);
+}
 
-// // -----------------------------------------------------------------------------
+static inline void	draw_pixel(mlx_image_t *img, t_vertex v0)
+{
+	if (v0.pos.x >= 0 && v0.pos.x < (int)img->width && \
+		v0.pos.y >= 0 && v0.pos.y < (int)img->height)
+		mlx_put_pixel(img, v0.pos.x, v0.pos.y, v0.color);
+}
 
-// int32_t ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
-// {
-//     return (r << 24 | g << 16 | b << 8 | a);
-// }
-
-// void ft_randomize(void* param)
-// {
-// 	(void)param;
-// 	for (uint32_t i = 0; i < image->width; ++i)
-// 	{
-// 		for (uint32_t y = 0; y < image->height; ++y)
-// 		{
-// 			uint32_t color = ft_pixel(
-// 				rand() % 0xFF, // R
-// 				rand() % 0xFF, // G
-// 				rand() % 0xFF, // B
-// 				rand() % 0xFF  // A
-// 			);
-// 			mlx_put_pixel(image, i, y, color);
-// 		}
-// 	}
-// }
-
-// void ft_hook(void* param)
-// {
-// 	mlx_t* mlx = param;
-
-// 	if (mlx_is_key_down(mlx, MLX_KEY_ESCAPE))
-// 		mlx_close_window(mlx);
-// 	if (mlx_is_key_down(mlx, MLX_KEY_UP))
-// 		image->instances[0].y -= 5;
-// 	if (mlx_is_key_down(mlx, MLX_KEY_DOWN))
-// 		image->instances[0].y += 5;
-// 	if (mlx_is_key_down(mlx, MLX_KEY_LEFT))
-// 		image->instances[0].x -= 5;
-// 	if (mlx_is_key_down(mlx, MLX_KEY_RIGHT))
-// 		image->instances[0].x += 5;
-// }
-
-// // -----------------------------------------------------------------------------
-
-// int32_t main(void)
-// {
-// 	mlx_t* mlx;
-
-// 	// Gotta error check this stuff
-// 	if (!(mlx = mlx_init(WIDTH, HEIGHT, "MLX42", true)))
-// 	{
-// 		puts(mlx_strerror(mlx_errno));
-// 		return(EXIT_FAILURE);
-// 	}
-// 	if (!(image = mlx_new_image(mlx, 128, 128)))
-// 	{
-// 		mlx_close_window(mlx);
-// 		puts(mlx_strerror(mlx_errno));
-// 		return(EXIT_FAILURE);
-// 	}
-// 	if (mlx_image_to_window(mlx, image, 0, 0) == -1)
-// 	{
-// 		mlx_close_window(mlx);
-// 		puts(mlx_strerror(mlx_errno));
-// 		return(EXIT_FAILURE);
-// 	}
-
-// 	mlx_loop_hook(mlx, ft_randomize, mlx);
-// 	mlx_loop_hook(mlx, ft_hook, mlx);
-
-// 	mlx_loop(mlx);
-// 	mlx_terminate(mlx);
-// 	return (EXIT_SUCCESS);
-// }
+t_vertex	proj_iso(t_vertex *v)
+{
+	return (t_vertex)
+	{
+		.pos.x = ((*v).pos.x - (*v).pos.y) * TILE_WIDTH / 2,
+		.pos.y = ((*v).pos.x + (*v).pos.y) * TILE_HEIGHT / 2 - (*v).pos.z * ALTITUDE_SCALE,
+		.pos.z = (*v).pos.z,
+		.color = (*v).color
+	};
+}
