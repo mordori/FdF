@@ -6,19 +6,18 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 22:37:25 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/12 01:05:53 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/16 20:27:07 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FDF_H
 # define FDF_H
 
-# define WIDTH 512
-# define HEIGHT 512
+# define WIDTH 2560
+# define HEIGHT 1440
 # define WHITE 0xFFFFFFFF
-# define TILE_WIDTH 32
-# define TILE_HEIGHT 16
-# define ALTITUDE_SCALE 2
+# define BLACK 0x000000FF
+# define ALTITUDE 100
 
 # include <stdlib.h>	// exit
 # include <stdio.h>		// perror
@@ -45,6 +44,27 @@ typedef struct	s_vec3
 	int	z;
 }				t_vec3;
 
+typedef struct	s_mat4
+{
+	float	m[4][4];
+}				t_mat4;
+
+typedef struct	s_color
+{
+	uint8_t	r;
+	uint8_t	g;
+	uint8_t	b;
+	uint8_t	a;
+}				t_color;
+
+typedef struct	s_quad
+{
+	int	topLeft;
+	int topRight;
+	int	bottomLeft;
+	int	bottomRight;
+}				t_quad;
+
 typedef struct	s_vertex
 {
 	t_vec3		pos;
@@ -53,11 +73,16 @@ typedef struct	s_vertex
 
 typedef struct	s_render_context
 {
+	mlx_t		*mlx;
 	mlx_image_t	*img;
 	t_vector	*vertices;
 	t_vector	*indices;
 	t_vec2		rows_cols;
-	t_vertex	(*project)(t_vertex *v);
+	t_vec2		offset;
+	t_mat4		transform;
+	float		scale;
+	int			max_altitude;
+	t_vertex	(*project)(t_vertex *v, float scale, t_mat4 transform);
 }				t_render_context;
 
 #endif

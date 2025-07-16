@@ -6,7 +6,7 @@
 #    By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/30 16:50:13 by myli-pen          #+#    #+#              #
-#    Updated: 2025/07/12 02:07:25 by myli-pen         ###   ########.fr        #
+#    Updated: 2025/07/16 02:22:00 by myli-pen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,8 +20,8 @@ LIBFT		=$(DIR_LIBFT)libft.a
 MLX42		=$(DIR_MLX)build/libmlx42.a
 
 CC			=cc
-#CFLAGS		=-Wall -Wextra -Werror -Wunreachable-code -O3
-CFLAGS		=-O3
+CFLAGS		=-Wall -Wextra -Werror -Wunreachable-code -O3
+#CFLAGS		=-O3
 LDFLAGS		=-ldl -lglfw -pthread -lm
 VECTOR_SIZE	=1024
 
