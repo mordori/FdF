@@ -6,7 +6,7 @@
 #    By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/30 16:50:13 by myli-pen          #+#    #+#              #
-#    Updated: 2025/07/16 02:22:00 by myli-pen         ###   ########.fr        #
+#    Updated: 2025/07/17 18:25:16 by myli-pen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,6 @@ MLX42		=$(DIR_MLX)build/libmlx42.a
 
 CC			=cc
 CFLAGS		=-Wall -Wextra -Werror -Wunreachable-code -O3
-#CFLAGS		=-O3
 LDFLAGS		=-ldl -lglfw -pthread -lm
 VECTOR_SIZE	=1024
 
@@ -36,7 +35,8 @@ DIR_DEP		=dep/
 HEADERS		=$(addprefix -I , \
 				$(DIR_INC) $(DIR_LIBFT)$(DIR_INC) $(DIR_MLX)$(DIR_INC)MLX42/)
 SRCS		=$(addprefix $(DIR_SRC), \
-				fdf.c)
+				fdf.c fdf_utils.c mesh.c parsing.c projection.c rendering.c \
+				rendering_utils.c)
 OBJS		=$(patsubst $(DIR_SRC)%.c, $(DIR_OBJ)%.o, $(SRCS))
 DEPS		=$(patsubst $(DIR_SRC)%.c, $(DIR_DEP)%.d, $(SRCS))
 
