@@ -6,15 +6,15 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 22:37:25 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/18 07:12:52 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/19 07:21:40 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FDF_H
 # define FDF_H
 
-# define WIDTH 2560
-# define HEIGHT 1440
+# define WIDTH 1920
+# define HEIGHT 1080
 
 # include <stdlib.h>
 # include <stdio.h>
@@ -30,12 +30,27 @@
 # include "libft_mem.h"
 # include "libft_vector.h"
 
-typedef struct s_view
+typedef enum	e_proj
+{
+	ISOMETRIC,
+	ORTHOGRAPHIC,
+	PERSPECTIVE
+}				t_proj;
+
+typedef struct s_cam
 {
 	t_vec3	eye;
 	t_vec3	target;
 	t_vec3	up;
-}				t_view;
+	float	distance;
+	float	yaw;
+	float	pitch;
+	float	fov;
+	float	aspect;
+	float	near;
+	float	far;
+	t_proj	projection;
+}				t_cam;
 
 typedef struct s_matrices
 {
@@ -55,34 +70,30 @@ typedef struct	s_context
 	t_vector	*verts;
 	t_vector	*tris;
 	t_vec2		rows_cols;
-	t_vec2		offset;
 	t_vec3		center;
-	bool		alt_color;
-	float		scale;
-	int			max_alt;
-	float		fov;
-	float		aspect;
-	float		near;
-	float		far;
+	t_vec3		bounds;
 	t_transform	transform;
-	t_view		view;
+	t_cam		cam;
 }				t_context;
 
-int		parse_map(char *map, t_vector *verts, t_vec2 *rows_cols, int *alt);
+int	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img);
+int		parse_map(char *map, t_vector *verts, t_vec2 *rows_cols);
 void	on_close(void* param);
 void	on_resize(int width, int height, void *param);
 void	ft_mlx_error(mlx_t *mlx);
-//t_vertex	proj_iso(t_vertex *v, float scale, t_mat4 transform);
-t_mat4	proj_persp(float fov, float aspect, float near, float far);
-//void	compute_scale(t_context *ctx);
-//void	get_bounds(t_context *ctx);
 t_vertex	*make_vert(float x, float y, float z, uint32_t color);
-void	make_triangles(t_vector *tris, t_vec2 rows_cols);
+bool	make_triangles(t_vector *tris, t_vec2 rows_cols);
 t_vec3	*make_tri(int x, int y, int z);
 void	clear_image(mlx_image_t *img, uint32_t color);
 uint32_t	lerp_color(uint32_t c1, uint32_t c2, float t);
 void	render(void *param);
 void	fdf_free(t_vector *verts, t_vector *tris, t_context *ctx);
 bool	mvp(t_vertex *vert, t_context *ctx);
+void	update_camera(t_cam *cam);
+void	init_camera(t_context *ctx, t_vec3 target);
+t_mat4	isometric_rot(void);
+void	update_ui(t_context *ctx);
+void	update_ui_2(t_context *ctx);
+void	focus(t_context *ctx);
 
 #endif

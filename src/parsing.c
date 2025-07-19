@@ -6,18 +6,18 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:04:16 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/17 20:09:48 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/18 15:02:30 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
 static inline uint32_t	parse_color(const char *str);
-static inline int	parse_data(char **elem, t_vector *verts, int *max, int row);
+static inline int	parse_data(char **elem, t_vector *verts, int row);
 static inline int	init_line(char *line, char ***elements);
 static inline void	free_parse(char *line, char **elements);
 
-int	parse_map(char *map, t_vector *verts, t_vec2 *rows_cols, int *max_alt)
+int	parse_map(char *map, t_vector *verts, t_vec2 *rows_cols)
 {
 	char	*line;
 	char	**elements;
@@ -35,7 +35,7 @@ int	parse_map(char *map, t_vector *verts, t_vec2 *rows_cols, int *max_alt)
 	{
 		if (init_line(line, &elements) == ERROR)
 			return (free_parse(line, elements), ERROR);
-		col = parse_data(elements, verts, max_alt, rows_cols->x);
+		col = parse_data(elements, verts, rows_cols->x);
 		if (col == ERROR || (rows_cols->x && col != rows_cols->y))
 			return (free_parse(line, elements), ERROR);
 		rows_cols->x++;
@@ -66,12 +66,12 @@ static inline void	free_parse(char *line, char **elements)
 	free(line);
 }
 
-static inline int	parse_data(char **elem, t_vector *verts, int *max, int row)
+static inline int	parse_data(char **elem, t_vector *verts, int row)
 {
 	char		**data;
 	uint32_t	color;
 	int			col;
-	int			altitude;
+	t_vertex	*vert;
 
 	col = 0;
 	while (elem[col])
@@ -84,9 +84,10 @@ static inline int	parse_data(char **elem, t_vector *verts, int *max, int row)
 			return (ft_free_split(data), ERROR);
 		if (data[1])
 			color = parse_color(data[1]);
-		altitude = ft_atoi(data[0]);
-		vector_add(verts, make_vert(col++, row, altitude, color));
-		*max = ft_imax(((t_vertex *)vector_getlast(verts))->pos.z, *max);
+		vert = make_vert(col++, row, ft_atoi(data[0]), color);
+		if (!vert)
+			return (ft_free_split(data), ERROR);
+		vector_add(verts, vert);
 		ft_free_split(data);
 	}
 	return (col);

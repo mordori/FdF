@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:14:56 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/18 05:06:53 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/18 22:49:23 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,17 @@
 
 t_vertex	*make_vert(float x, float y, float z, uint32_t color)
 {
-	t_vertex *vertex;
+	t_vertex *v;
 
-	vertex = malloc(sizeof (t_vertex));
-	if (!vertex)
+	v = malloc(sizeof (t_vertex));
+	if (!v)
 		return (NULL);
-	vertex->pos.x = x;
-	vertex->pos.y = y;
-	vertex->pos.z = z;
-	vertex->pos.w = 1.0f;
-	vertex->color = color;
-	return (vertex);
+	v->pos = vec4(x, -y, z, 1.0f);
+	v->color = color;
+	return (v);
 }
 
-void	make_triangles(t_vector *tris, t_vec2 rows_cols)
+bool	make_triangles(t_vector *tris, t_vec2 rows_cols)
 {
 	t_vec3	*tri;
 	t_quad	q;
@@ -48,9 +45,12 @@ void	make_triangles(t_vector *tris, t_vec2 rows_cols)
 			tri = make_tri(q.topRight, q.topLeft, q.bottomLeft);
 		else
 			tri = make_tri(q.bottomLeft, q.bottomRight, q.topRight);
+		if (!tri)
+			return (false);
 		vector_add(tris, tri);
 		++i;
 	}
+	return (true);
 }
 
 t_vec3	*make_tri(int x, int y, int z)
@@ -60,8 +60,6 @@ t_vec3	*make_tri(int x, int y, int z)
 	vec = malloc(sizeof (t_vec3));
 	if (!vec)
 		return (NULL);
-	vec->x = x;
-	vec->y = y;
-	vec->z = z;
+	*vec = vec3(x, y, z);
 	return (vec);
 }

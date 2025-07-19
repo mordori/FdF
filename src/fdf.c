@@ -6,17 +6,15 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/18 07:26:54 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/19 06:46:41 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-static inline void	input(mlx_key_data_t keydata, void *param);
-static inline int	initialize(char *file, t_context **ctx);
-static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img);
-static inline void	controls(void *param);
 static inline void	loop(void *param);
+static inline void	input(mlx_key_data_t keydata, void *param);
+static inline void	controls(void *param);
 
 int	main(int argc, char *argv[])
 {
@@ -26,16 +24,15 @@ int	main(int argc, char *argv[])
 
 	if (argc != 2)
 		return (EXIT_FAILURE);
-	mlx_set_setting(MLX_MAXIMIZED, true);
+	mlx_set_setting(MLX_FULLSCREEN, true);
 	mlx = mlx_init(WIDTH, HEIGHT, "FdF", true);
 	if (!mlx)
 		ft_mlx_error(NULL);
 	img  = mlx_new_image(mlx, mlx->width, mlx->height);
 	if (!img || (mlx_image_to_window(mlx, img, 0, 0) < 0))
 		ft_mlx_error(mlx);
-	if (initialize(argv[1], &ctx) == ERROR)
+	if (initialize(argv[1], &ctx, mlx, img) == ERROR)
 		ft_mlx_error(mlx);
-	init_context(ctx, mlx, img);
 	mlx_key_hook(mlx, input, ctx);
 	mlx_loop_hook(mlx, loop, ctx);
 	mlx_close_hook(mlx, on_close, ctx);
@@ -55,58 +52,6 @@ static inline void	loop(void *param)
 	render(ctx);
 }
 
-static inline int	initialize(char *file, t_context **ctx)
-{
-	t_vector	*verts;
-	t_vector	*tris;
-	int			max_alt;
-	t_vec2		rows_cols;
-
-	verts = malloc(sizeof (t_vector));
-	tris = malloc(sizeof (t_vector));
-	*ctx = malloc(sizeof (t_context));
-	verts->items = NULL;
-	tris->items = NULL;
-	if (!verts || !tris || !*ctx)
-		return (fdf_free(verts, tris, *ctx), ERROR);
-	max_alt = INT32_MIN;
-	if (!vector_init(verts, true))
-		return (fdf_free(verts, tris, *ctx), ERROR);
-	if (parse_map(file, verts, &rows_cols, &max_alt) == ERROR)
-		return (fdf_free(verts, tris, *ctx), ERROR);
-	if (!vector_init(tris, true))
-		return (fdf_free(verts, tris, *ctx), ERROR);
-	make_triangles(tris, rows_cols);
-	(*ctx)->verts = verts;
-	(*ctx)->tris = tris;
-	(*ctx)->rows_cols = rows_cols;
-	(*ctx)->max_alt = max_alt;
-	return (true);
-}
-
-static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img)
-{
-	t_vec3	eye = {15, 0, 20};
-	t_vec3	target = {0, 0, -1.0f};
-	t_vec3	up = {0, 1, 0};
-
-	ctx->transform.pos = (t_vec3){0.0f, 0.0f, 0.0f};
-	ctx->transform.rot = (t_vec3){0.0f, 0.0f, 0.0f};
-	ctx->transform.scale = (t_vec3){1.0f, 1.0f, 1.0f};
-
-	ctx->mlx = mlx;
-	ctx->img = img;
-	ctx->fov = M_PI / 3.0f;
-	ctx->aspect = (float)mlx->width / mlx->height;
-	ctx->near = 0.1f;
-	ctx->far = 100.0f;
-	ctx->scale = 1.0f;
-	ctx->alt_color = false;
-	ctx->view.eye = eye;
-	ctx->view.target = target;
-	ctx->view.up = up;
-}
-
 static inline void	input(mlx_key_data_t keydata, void *param)
 {
 	t_context	*ctx;
@@ -118,29 +63,101 @@ static inline void	input(mlx_key_data_t keydata, void *param)
 		mlx_close_window(ctx->mlx);
 	if (keydata.key == MLX_KEY_P && keydata.action == MLX_RELEASE)
 	{
-
+		if (ctx->cam.projection == ISOMETRIC)
+			ctx->cam.projection = ORTHOGRAPHIC;
+		else if (ctx->cam.projection == ORTHOGRAPHIC)
+			ctx->cam.projection = PERSPECTIVE;
+		else if (ctx->cam.projection == PERSPECTIVE)
+			ctx->cam.projection = ISOMETRIC;
 	}
-	if (keydata.key == MLX_KEY_C && keydata.action == MLX_RELEASE)
-		ctx->alt_color = !ctx->alt_color;
+	if (keydata.key == MLX_KEY_F && keydata.action == MLX_RELEASE)
+		focus(ctx);
+}
+
+static inline void pan(t_cam *cam, float dx, float dy)
+{
+	float	speed;
+	t_vec3	forward;
+	t_vec3	right;
+	t_vec3	up;
+
+	speed = cam->distance * 0.0016f;
+	forward = vec3_normalize(vec3_sub(cam->target, cam->eye));
+	right = vec3_normalize(vec3_cross(forward, cam->up));
+	up = vec3_normalize(vec3_cross(right, forward));
+	cam->target = vec3_add(cam->target, vec3_scale(right, -dx * speed));
+	cam->target = vec3_add(cam->target, vec3_scale(up, dy * speed));
+	cam->eye = vec3_add(cam->eye, vec3_scale(right, -dx * speed));
+	cam->eye = vec3_add(cam->eye, vec3_scale(up, dy * speed));
+}
+
+static inline void zoom(t_cam *cam, float delta)
+{
+	float	speed;
+
+	speed = cam->distance * 0.1f;
+	cam->distance = fmaxf(0.1f, cam->distance - delta * speed);
 }
 
 static inline void	controls(void *param)
 {
 	t_context	*ctx;
+	t_vec2		pos;
+	t_vec2		d;
+	float		sensitivity = 0.005f;
+	static double prev_x = -1;
+    static double prev_y = -1;
+    static bool zooming = false;
 
+	d = vec2(0, 0);
 	ctx = param;
 	if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
-		mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_LEFT))
+		mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_LEFT) && \
+		ctx->cam.projection != ISOMETRIC)
 	{
-
+		mlx_set_cursor_mode(ctx->mlx, MLX_MOUSE_HIDDEN);
+		mlx_get_mouse_pos(ctx->mlx, &pos.x, &pos.y);
+		if (prev_x >= 0 && prev_y >= 0)
+		{
+			d.x = pos.x - prev_x;
+			d.y = pos.y - prev_y;
+			ctx->cam.yaw -= d.x * sensitivity;
+			ctx->cam.pitch += d.y * sensitivity;
+		}
+		prev_x = pos.x;
+		prev_y = pos.y;
+		//mlx_set_mouse_pos(ctx->mlx, ctx->mlx->width / 2, ctx->mlx->height / 2);
+		update_camera(&ctx->cam);
 	}
-	if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
+	else if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
 		mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_RIGHT))
 	{
-
+		mlx_get_mouse_pos(ctx->mlx, &pos.x, &pos.y);
+		if (!zooming) { prev_y = pos.y; zooming = true; }
+		float delta = (pos.y - prev_y) * 0.05f;
+		zoom(&ctx->cam, delta);
+		prev_y = pos.y;
+		update_camera(&ctx->cam);
 	}
-	if (mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_MIDDLE))
+	else if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
+		mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_MIDDLE))
 	{
-
+		mlx_get_mouse_pos(ctx->mlx, &pos.x, &pos.y);
+		if (prev_x >= 0 && prev_y >= 0)
+		{
+			d.x = pos.x - prev_x;
+			d.y = pos.y - prev_y;
+		}
+		pan(&ctx->cam, d.x, d.y);
+		prev_x = pos.x;
+		prev_y = pos.y;
+		update_camera(&ctx->cam);
+	}
+	else
+	{
+		prev_x = -1;
+		prev_y = -1;
+		mlx_set_cursor_mode(ctx->mlx, MLX_MOUSE_NORMAL);
+		zooming = false;
 	}
 }
