@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:51 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/20 05:20:58 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/20 20:03:56 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,14 +48,15 @@ static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img)
 	ctx->alt_min_max.x = INT_MAX;
 	ctx->alt_min_max.y = INT_MIN;
 	normalize_model(ctx);
+	if (ctx->alt_min_max.x == ctx->alt_min_max.y)
+		ctx->alt_min_max.y = ctx->alt_min_max.x + 1;
 	ctx->transform.pos = vec3(0.0f, 0.0f, 0.0f);
 	ctx->transform.rot = vec3(0.0f, 0.0f, 0.0f);
 	ctx->transform.scale = vec3_n(1.0f);
 	ctx->mlx = mlx;
 	ctx->img = img;
-	ctx->colors = AMAZING;
-	ctx->color1 = 0x808080FF;
-	ctx->color2 = 0xA0A0A0FF;
+	ctx->colors = DEFAULT;
+	ctx->color = WHITE;
 	ctx->time_rot = 0.0;
 	init_camera(ctx, vec3(0, 0, 0));
 }
@@ -97,6 +98,7 @@ static inline void normalize_model(t_context *ctx)
 
 void	reset_transforms(t_context *ctx)
 {
+	ctx->spin = OFF;
 	ctx->transform.pos = vec3_n(0.0f);
 	ctx->transform.rot = vec3_n(0.0f);
 	ctx->transform.scale = vec3_n(1.0f);

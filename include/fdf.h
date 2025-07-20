@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 22:37:25 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/20 06:52:47 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/20 19:54:16 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 # define WIDTH 1920
 # define HEIGHT 1080
+
+# define SENSITIVITY 0.005f
 
 # include <stdlib.h>
 # include <stdio.h>
@@ -90,6 +92,7 @@ typedef struct	s_context
 	t_cam		cam;
 	t_colors	colors;
 	t_spin		spin;
+	uint32_t	color;
 	uint32_t	color1;
 	uint32_t	color2;
 	t_vec3		min;
@@ -118,6 +121,6 @@ void	frame(t_context *ctx);
 uint32_t	rainbow_rgb(double t);
 void	reset_transforms(t_context *ctx);
 t_mat4	model_matrix(t_context *ctx);
-void	compute_bounds(t_context *ctx);
+void	control_camera(void *param);
 
 #endif
