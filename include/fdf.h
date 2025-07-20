@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 22:37:25 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/20 19:54:16 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/21 00:01:08 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ typedef struct	s_context
 {
 	mlx_t		*mlx;
 	mlx_image_t	*img;
+	float		*z_buf;
 	t_vector	*verts;
 	t_vector	*tris;
 	t_vec2i		rows_cols;
@@ -100,15 +101,14 @@ typedef struct	s_context
 	double		time_rot;
 }				t_context;
 
-int	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img);
+void	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img);
 int		parse_map(char *map, t_vector *verts, t_vec2i *rows_cols);
-void	on_close(void* param);
 void	on_resize(int width, int height, void *param);
-void	ft_mlx_error(mlx_t *mlx);
+void	ft_error(mlx_t *mlx, char *message);
 t_vertex	*make_vert(float x, float y, float z, uint32_t color);
 bool	make_triangles(t_vector *tris, t_vec2i rows_cols);
 t_vec3	*make_tri(int x, int y, int z);
-void	clear_image(mlx_image_t *img, uint32_t color);
+void	clear_image(t_context *ctx, uint32_t color);
 uint32_t	lerp_color(uint32_t c1, uint32_t c2, float t);
 void	render(void *param);
 void	fdf_free(t_vector *verts, t_vector *tris, t_context *ctx);

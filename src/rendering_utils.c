@@ -6,28 +6,35 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:09:05 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/19 19:21:29 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/21 00:01:02 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-void	clear_image(mlx_image_t *img, uint32_t color)
+void	clear_image(t_context *ctx, uint32_t color)
 {
 	size_t		i;
 	size_t		width;
 	size_t		height;
 	uint32_t	*pixels;
 
-	pixels = (uint32_t *)img->pixels;
-	width = img->width;
-	height = img->height;
+	pixels = (uint32_t *)ctx->img->pixels;
+	width = ctx->img->width;
+	height = ctx->img->height;
 	i = 0;
 	while (i < width)
+	{
 		pixels[i++] = color;
+		ctx->z_buf[i] = INFINITY;
+	}
 	i = 1;
 	while (i < height)
-		ft_memcpy(&pixels[i++ * width], pixels, width * sizeof (uint32_t ));
+	{
+		ft_memcpy(&pixels[i * width], pixels, width * sizeof (uint32_t ));
+		ft_memcpy(&ctx->z_buf[i * width], ctx->z_buf, width * sizeof (float));
+		++i;
+	}
 }
 
 uint32_t	lerp_color(uint32_t c1, uint32_t c2, float t)
@@ -87,10 +94,9 @@ void	update_ui_2(t_context *ctx)
 
 	if (info)
 		mlx_delete_image(ctx->mlx, info);
+	str = "[R]reset   [WASD]translate   [ARROWS]rotate   [SPACE]spin";
 	if (ctx->cam.projection == ISOMETRIC)
-		str = "[WASD]translate   [R]reset";
-	else
-		str = "[WASD]translate   [R]reset   [SPACE]spin";
+		str = "[R]reset   [WASD]translate";
 	info = mlx_put_string(ctx->mlx, str, 100, ctx->mlx->height - 145);
 	info->instances[0].z = 103;
 }

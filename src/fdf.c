@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/20 19:33:01 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/21 00:57:56 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,12 @@
 static inline void	loop(void *param);
 static inline void	input(mlx_key_data_t keydata, void *param);
 
+/**
+ * Initializes mlx, render img, sets the loop hooks, and begins initializing
+ * the scene context.
+ *
+ * @param argv File path e.g. "maps/42.fdf"
+ */
 int	main(int argc, char *argv[])
 {
 	mlx_t		*mlx;
@@ -22,19 +28,17 @@ int	main(int argc, char *argv[])
 	t_context	*ctx;
 
 	if (argc != 2)
-		return (EXIT_FAILURE);
+		return (ft_error(mlx, "arguments"), EXIT_FAILURE);
 	mlx_set_setting(MLX_FULLSCREEN, true);
 	mlx = mlx_init(WIDTH, HEIGHT, "FdF", true);
 	if (!mlx)
-		ft_mlx_error(NULL);
+		ft_error(NULL, "mlx alloc");
 	img  = mlx_new_image(mlx, mlx->width, mlx->height);
 	if (!img || (mlx_image_to_window(mlx, img, 0, 0) < 0))
-		ft_mlx_error(mlx);
-	if (initialize(argv[1], &ctx, mlx, img) == ERROR)
-		ft_mlx_error(mlx);
-	mlx_key_hook(mlx, input, ctx);
+		ft_error(mlx, "img alloc");
+	initialize(argv[1], &ctx, mlx, img);
 	mlx_loop_hook(mlx, loop, ctx);
-	mlx_close_hook(mlx, on_close, ctx);
+	mlx_key_hook(mlx, input, ctx);
 	mlx_resize_hook(mlx, on_resize, ctx);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
@@ -42,6 +46,11 @@ int	main(int argc, char *argv[])
 	return (EXIT_SUCCESS);
 }
 
+/**
+ * Main loop for camera updates and rendering.
+ *
+ * @param param Scene context.
+ */
 static inline void	loop(void *param)
 {
 	static double	time_color;
@@ -53,8 +62,8 @@ static inline void	loop(void *param)
 	t = ctx->time_rot;
 	if (ctx->colors == AMAZING)
 	{
-		ctx->color1 = rainbow_rgb(wrapf(time_color * 2.0f + 5.0f));
-		ctx->color2 = rainbow_rgb(wrapf(time_color * 2.0f));
+		ctx->color1 = rainbow_rgb(wrapf(-time_color * 2.0f + M_PI_2));
+		ctx->color2 = rainbow_rgb(wrapf(-time_color * 2.0f));
 	}
 	if (ctx->spin == ON)
 	{
@@ -65,6 +74,12 @@ static inline void	loop(void *param)
 	render(ctx);
 }
 
+/**
+ * Loop hook for discrete input commands.
+ *
+ * @param keydata Mlx key data.
+ * @param param Scene context.
+ */
 static inline void	input(mlx_key_data_t keydata, void *param)
 {
 	t_context	*ctx;

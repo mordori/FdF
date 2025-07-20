@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:51 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/20 20:03:56 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/21 00:38:17 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img);
 static inline void normalize_model(t_context *ctx);
 
-int	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
+void	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
 {
 	t_vector	*verts;
 	t_vector	*tris;
@@ -27,24 +27,31 @@ int	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
 	verts->items = NULL;
 	tris->items = NULL;
 	if (!verts || !tris || !*ctx)
-		return (fdf_free(verts, tris, *ctx), ERROR);
+		return (fdf_free(verts, tris, *ctx), ft_error(mlx, "ctx alloc"));
 	if (!vector_init(verts, true))
-		return (fdf_free(verts, tris, *ctx), ERROR);
+		return (fdf_free(verts, tris, *ctx), ft_error(mlx, "verts init"));
 	if (parse_map(file, verts, &rows_cols) == ERROR)
-		return (fdf_free(verts, tris, *ctx), ERROR);
+		return (fdf_free(verts, tris, *ctx), ft_error(mlx, "map parse"));
 	if (!vector_init(tris, true))
-		return (fdf_free(verts, tris, *ctx), ERROR);
+		return (fdf_free(verts, tris, *ctx), ft_error(mlx, "tris init"));
 	if(!make_triangles(tris, rows_cols))
-		return (fdf_free(verts, tris, *ctx), ERROR);
+		return (fdf_free(verts, tris, *ctx), ft_error(mlx, "tris fill"));
 	(*ctx)->verts = verts;
 	(*ctx)->tris = tris;
 	(*ctx)->rows_cols = rows_cols;
 	init_context(*ctx, mlx, img);
-	return (true);
 }
 
 static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img)
 {
+	size_t	i;
+
+	ctx->z_buf = malloc(sizeof(float) * img->width * img->height);
+	if(!ctx->z_buf)
+		return (fdf_free(ctx->verts, ctx->tris, ctx), ft_error(mlx, "z alloc"));
+	i = 0;
+	while (i < img->width * img->height)
+		ctx->z_buf[i++] = INFINITY;
 	ctx->alt_min_max.x = INT_MAX;
 	ctx->alt_min_max.y = INT_MIN;
 	normalize_model(ctx);

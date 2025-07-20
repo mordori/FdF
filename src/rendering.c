@@ -6,16 +6,16 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:08:26 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/20 20:01:53 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/21 00:15:05 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
 static inline void	renderline(t_context *ctx, int i1, int i2);
-static inline void	drawline(t_context *ctx, t_vertex v0, t_vertex v1, float y);
+static inline void	drwline(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 o);
 static inline void	movepixel(t_vec2i *d, t_vec2i *s, t_vec2i *e, t_vertex *v0);
-static inline void	drawpixel(t_context *ctx, t_vertex v0, uint32_t c);
+static inline void	drawpixel(t_context *ctx, t_vertex v0, uint32_t c, float z);
 
 void	render(void *param)
 {
@@ -25,8 +25,8 @@ void	render(void *param)
 	t_vec2i		v_rc;
 
 	ctx = param;
+	clear_image(ctx, 0xFF000000);
 	v_rc = vec2i(ctx->rows_cols.x - 1, ctx->rows_cols.y - 1);
-	clear_image(ctx->img, 0xFF000000);
 	i = 0;
 	while (i < ctx->tris->total)
 	{
@@ -62,11 +62,11 @@ static inline void	renderline(t_context *ctx, int i1, int i2)
 		x_visible = v1->screen.x >= 0 && v1->screen.x < (int)ctx->img->width;
 		y_visible = v1->screen.y >= 0 && v1->screen.y < (int)ctx->img->height;
 		if (v0_visible || (x_visible && y_visible))
-			drawline(ctx, *v0, *v1, v0->pos.y);
+			drwline(ctx, *v0, *v1, vec3(0.0f, v0->pos.y, v0->z));
 	}
 }
 
-static inline void	drawline(t_context *ctx, t_vertex v0, t_vertex v1, float y)
+static inline void	drwline(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 o)
 {
 	t_vec2i	d;
 	t_vec2i	s;
@@ -83,16 +83,17 @@ static inline void	drawline(t_context *ctx, t_vertex v0, t_vertex v1, float y)
 	{
 		t.x = steps.x++ / steps.y;
 		ctx->color = lerp_color(v0.color, v1.color, t.x);
+		o.z = ft_lerp(v0.z, v1.z, t.x);
 		if (ctx->colors == AMAZING)
 		{
-			t.y = ft_lerp(y, v1.pos.y, t.x);
+			t.y = ft_lerp(o.y, v1.pos.y, t.x);
 			t.z = ft_normalize(t.y, ctx->alt_min_max.x, ctx->alt_min_max.y);
 			ctx->color = lerp_color(ctx->color1, ctx->color2, t.z);
 		}
-		drawpixel(ctx, v0, ctx->color);
+		drawpixel(ctx, v0, ctx->color, o.z);
 		movepixel(&d, &s, &error, &v0);
 	}
-	drawpixel(ctx, v0, ctx->color);
+	drawpixel(ctx, v0, ctx->color, o.z);
 }
 
 static inline void	movepixel(t_vec2i *d, t_vec2i *s, t_vec2i *e, t_vertex *v0)
@@ -110,9 +111,22 @@ static inline void	movepixel(t_vec2i *d, t_vec2i *s, t_vec2i *e, t_vertex *v0)
 	}
 }
 
-static inline void	drawpixel(t_context *ctx, t_vertex v0, uint32_t c)
+static inline void	drawpixel(t_context *ctx, t_vertex v0, uint32_t c, float z)
 {
-	if (v0.screen.x >= 0 && v0.screen.x < (int)ctx->img->width && \
-		v0.screen.y >= 0 && v0.screen.y < (int)ctx->img->height)
-		mlx_put_pixel(ctx->img, v0.screen.x, v0.screen.y, c);
+	int	x;
+	int	y;
+	int	index;
+
+	x = v0.screen.x;
+	y = v0.screen.y;
+	if (x >= 0 && x < (int)ctx->img->width && \
+		y >= 0 && y < (int)ctx->img->height)
+	{
+		index = y * ctx->img->width + x;
+		if(z < ctx->z_buf[index])
+		{
+			ctx->z_buf[index] = z;
+			mlx_put_pixel(ctx->img, x, y, c);
+		}
+	}
 }

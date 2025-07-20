@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:18:33 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/20 06:53:04 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/21 00:05:50 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,10 @@ bool	mvp(t_vertex *vert, t_context *ctx)
 	v_clip = mat4_mul_vec4(m.mvp, vert->pos);
 	if (v_clip.w <= 0.0f)
 		return (false);
-	v_ndc = vec3(v_clip.x/v_clip.w, v_clip.y/v_clip.w, v_clip.z/v_clip.w);
+	v_ndc = vec3_scale(vec3_4(v_clip), 1.0f / v_clip.w);
 	vert->screen.x = (v_ndc.x + 1.0f) * 0.5f * ctx->mlx->width;
 	vert->screen.y = (1.0f - v_ndc.y) * 0.5f * ctx->mlx->height;
+	vert->z = (v_ndc.z + 1.0f) * 0.5f;
 	return (true);
 }
 
@@ -84,8 +85,8 @@ static inline t_mat4	proj_persp(t_cam cam)
 	proj = mat4_zero();
 	proj.m[0][0] = f / cam.aspect;
 	proj.m[1][1] = f;
-	proj.m[2][2] = -(cam.far + cam.near) / (cam.near - cam.far);
-	proj.m[2][3] = -(2.0f * cam.far * cam.near) / (cam.near - cam.far);
+	proj.m[2][2] = (cam.far + cam.near) / (cam.near - cam.far);
+	proj.m[2][3] = (2.0f * cam.far * cam.near) / (cam.near - cam.far);
 	proj.m[3][2] = -1.0f;
 	return (proj);
 }

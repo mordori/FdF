@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 13:45:24 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/20 18:34:17 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/20 22:18:24 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static inline void	compute_bounds(t_context *ctx);
 
 void	update_camera(t_cam *cam)
 {
-	const float	limit = M_PI / 2 - 0.001f;
+	const float	limit = M_PI_2 - 0.001f;
 	t_vec3	dir;
 
 	if (cam->pitch > limit)
