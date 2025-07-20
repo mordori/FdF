@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:24:31 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/18 20:10:54 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/19 19:22:14 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	on_resize(int width, int height, void *param)
 		ft_mlx_error(ctx->mlx);
 	}
 	ctx->cam.aspect = (float)ctx->mlx->width / ctx->mlx->height;
-	printf("Window resized to: %d x %d\n", width, height);
+	frame(ctx);
 }
 
 void ft_mlx_error(mlx_t *mlx)

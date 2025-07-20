@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:14:56 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/18 22:49:23 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/20 01:28:56 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ t_vertex	*make_vert(float x, float y, float z, uint32_t color)
 	return (v);
 }
 
-bool	make_triangles(t_vector *tris, t_vec2 rows_cols)
+bool	make_triangles(t_vector *tris, t_vec2i rows_cols)
 {
 	t_vec3	*tri;
 	t_quad	q;

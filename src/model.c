@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:51 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/19 07:21:33 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/20 05:20:58 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
 {
 	t_vector	*verts;
 	t_vector	*tris;
-	t_vec2		rows_cols;
+	t_vec2i		rows_cols;
 
 	verts = malloc(sizeof (t_vector));
 	tris = malloc(sizeof (t_vector));
@@ -45,12 +45,18 @@ int	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
 
 static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img)
 {
+	ctx->alt_min_max.x = INT_MAX;
+	ctx->alt_min_max.y = INT_MIN;
 	normalize_model(ctx);
-	ctx->transform.pos = vec3_scale(ctx->center, -1.0f);
+	ctx->transform.pos = vec3(0.0f, 0.0f, 0.0f);
 	ctx->transform.rot = vec3(0.0f, 0.0f, 0.0f);
-	ctx->transform.scale = vec3_f(1.0f);
+	ctx->transform.scale = vec3_n(1.0f);
 	ctx->mlx = mlx;
 	ctx->img = img;
+	ctx->colors = AMAZING;
+	ctx->color1 = 0x808080FF;
+	ctx->color2 = 0xA0A0A0FF;
+	ctx->time_rot = 0.0;
 	init_camera(ctx, vec3(0, 0, 0));
 }
 
@@ -74,8 +80,28 @@ static inline void normalize_model(t_context *ctx)
 		max.x = fmaxf(max.x, v->pos.x);
 		max.y = fmaxf(max.y, v->pos.y);
 		max.z = fmaxf(max.z, v->pos.z);
+		ctx->alt_min_max.x = ft_imin(ctx->alt_min_max.x, v->pos.z);
+		ctx->alt_min_max.y = ft_imax(ctx->alt_min_max.y, v->pos.z);
 	}
-	ctx->center = vec3_scale(vec3(min.x + max.x, min.y + max.y, 0.0f), 0.5f);
+	ctx->center = vec3_scale(vec3_add(min, max), 0.5f);
+	i = 0;
+	while (i < ctx->verts->total)
+	{
+		v = vector_get(ctx->verts, i++);
+		v->pos = vec4_sub(v->pos, vec4_3(ctx->center));
+		v->pos = mat4_mul_vec4(mat4_rot_x(-M_PI / 2.0f), v->pos);
+	}
 	bounds = vec3(max.x - min.x, max.y - min.y, max.z - min.z);
 	ctx->bounds = bounds;
+}
+
+void	reset_transforms(t_context *ctx)
+{
+	ctx->transform.pos = vec3_n(0.0f);
+	ctx->transform.rot = vec3_n(0.0f);
+	ctx->transform.scale = vec3_n(1.0f);
+	ctx->cam.yaw = M_PI / 4.0f;
+	ctx->cam.pitch = atanf(1.0f / sqrtf(2.0f));
+	ctx->time_rot = 0.0;
+	frame(ctx);
 }

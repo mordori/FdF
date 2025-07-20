@@ -6,26 +6,26 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 13:45:24 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/19 06:46:04 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/20 06:49:03 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-static inline float	clamp_pitch(float pitch);
 static inline void compute_distance(t_context *ctx);
-static inline void	compute_bounds(t_context *ctx, t_vec3 *min, t_vec3 *max);
 
 void	update_camera(t_cam *cam)
 {
+	const float	limit = M_PI / 2 - 0.001f;
 	t_vec3	dir;
 
-	cam->pitch = clamp_pitch(cam->pitch);
+	if (cam->pitch > limit)
+		cam->pitch = limit;
+	if (cam->pitch < -limit)
+		cam->pitch = -limit;
 	dir.x = cosf(cam->pitch) * sinf(cam->yaw);
 	dir.y = sinf(cam->pitch);
 	dir.z = cosf(cam->pitch) * cosf(cam->yaw);
-
-
 	cam->eye = vec3_add(cam->target, vec3_scale(dir, cam->distance));
 }
 
@@ -51,64 +51,45 @@ static inline void compute_distance(t_context *ctx)
 	float	padding;
 
 	padding = 1.1f;
-	max_dim = fmaxf(ctx->bounds.x, ctx->bounds.y) * padding;
+	max_dim = fmaxf(fmaxf(ctx->bounds.x, ctx->bounds.y), ctx->bounds.z) * padding;
 	if (ctx->cam.projection == PERSPECTIVE)
 		ctx->cam.distance = (max_dim * 0.5f) / tanf(ctx->cam.fov * 0.5f);
 	else
 	{
-		if (ctx->bounds.x / ctx->cam.aspect > ctx->bounds.y)
-			max_dim = ctx->bounds.x;
-		else
-			max_dim = ctx->bounds.y;
-		ctx->cam.distance = max_dim * 0.6f;
+		ctx->cam.ortho_size = max_dim * 0.5f;
+		ctx->cam.distance = max_dim;
 	}
 }
 
-static inline float	clamp_pitch(float pitch)
-{
-	const float	limit = M_PI / 2 - 0.001f;
-	if (pitch > limit)
-		return (limit);
-	if (pitch < -limit)
-		return (-limit);
-	return (pitch);
-}
-
-static inline void	compute_bounds(t_context *ctx, t_vec3 *min, t_vec3 *max)
+void	compute_bounds(t_context *ctx)
 {
 	t_vertex	*v;
 	t_vec4		pos;
-	t_mat4		transform;
 	size_t		i;
+	t_mat4		m;
 
-	transform = mat4_translate(ctx->transform.pos);
-	transform = mat4_mul(mat4_scale(ctx->transform.scale), transform);
-	transform = mat4_mul(mat4_rot(ctx->transform.rot), transform);
-	*min = vec3(FLT_MAX, FLT_MAX, FLT_MAX);
-	*max = vec3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+	m = model_matrix(ctx);
+	ctx->min = vec3(FLT_MAX, FLT_MAX, FLT_MAX);
+	ctx->max = vec3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 	i = 0;
 	while (i < ctx->verts->total)
 	{
 		v = vector_get(ctx->verts, i++);
-		pos = mat4_mul_vec4(transform, v->pos);
-		min->x = fminf(min->x, pos.x);
-		min->y = fminf(min->y, pos.y);
-		min->z = fminf(min->z, pos.z);
-		max->x = fmaxf(max->x, pos.x);
-		max->y = fmaxf(max->y, pos.y);
-		max->z = fmaxf(max->z, pos.z);
+		pos = mat4_mul_vec4(m, v->pos);
+		ctx->min.x = fminf(ctx->min.x, pos.x);
+		ctx->min.y = fminf(ctx->min.y, pos.y);
+		ctx->min.z = fminf(ctx->min.z, pos.z);
+		ctx->max.x = fmaxf(ctx->max.x, pos.x);
+		ctx->max.y = fmaxf(ctx->max.y, pos.y);
+		ctx->max.z = fmaxf(ctx->max.z, pos.z);
 	}
 }
 
-void	focus(t_context *ctx)
+void	frame(t_context *ctx)
 {
-	t_vec3	min;
-	t_vec3	max;
-
-	compute_bounds(ctx, &min, &max);
-	ctx->center = vec3(min.x + max.x, min.y + max.y, 0.0f);
-	ctx->center = vec3_scale(ctx->center, 0.5f);
-	ctx->bounds = vec3_sub(max, min);
+	compute_bounds(ctx);
+	ctx->center = vec3_scale(vec3_add(ctx->min, ctx->max), 0.5f);
+	ctx->bounds = vec3_sub(ctx->max, ctx->min);
 	ctx->cam.target = ctx->center;
 	compute_distance(ctx);
 	update_camera(&ctx->cam);

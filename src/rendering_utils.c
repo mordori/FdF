@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:09:05 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/19 07:22:21 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/19 19:21:29 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ void	update_ui(t_context *ctx)
 	if (ctx->cam.projection == PERSPECTIVE)
 		proj = mlx_put_string(ctx->mlx, "Perspective", 100, 60);
 	controls = mlx_put_string(ctx->mlx, str, 100, ctx->mlx->height - 75);
-	str = "[ESC]quit   [P]projection   [F]focus";
+	str = "[ESC]quit   [C]color   [P]projection   [F]frame";
 	info = mlx_put_string(ctx->mlx, str, 100, ctx->mlx->height - 110);
 	info->instances[0].z = 101;
 	controls->instances[0].z = 102;
@@ -88,9 +88,21 @@ void	update_ui_2(t_context *ctx)
 	if (info)
 		mlx_delete_image(ctx->mlx, info);
 	if (ctx->cam.projection == ISOMETRIC)
-		str = "[WASD]translate";
+		str = "[WASD]translate   [R]reset";
 	else
-		str = "[WASD]translate   [R]rotate";
+		str = "[WASD]translate   [R]reset   [SPACE]spin";
 	info = mlx_put_string(ctx->mlx, str, 100, ctx->mlx->height - 145);
 	info->instances[0].z = 103;
+}
+
+uint32_t	rainbow_rgb(double t)
+{
+	float	r;
+	float	g;
+	float	b;
+
+	r = (sin(t) * 0.5f + 0.5f) * 255.0f;
+	g = (sin(t + 2.0f) * 0.5f + 0.5f) * 255.0f;
+	b = (sin(t + 4.0f) * 0.5f + 0.5f) * 255.0f;
+	return ((uint8_t)r << 24 | (uint8_t)g << 16 | (uint8_t)b << 8 | 0xFF);
 }

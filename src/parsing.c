@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:04:16 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/18 15:02:30 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/20 01:29:06 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static inline int	parse_data(char **elem, t_vector *verts, int row);
 static inline int	init_line(char *line, char ***elements);
 static inline void	free_parse(char *line, char **elements);
 
-int	parse_map(char *map, t_vector *verts, t_vec2 *rows_cols)
+int	parse_map(char *map, t_vector *verts, t_vec2i *rows_cols)
 {
 	char	*line;
 	char	**elements;

@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/19 06:46:41 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/20 06:50:05 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,10 +45,24 @@ int	main(int argc, char *argv[])
 
 static inline void	loop(void *param)
 {
-	t_context	*ctx;
+	static double	time_color;
+	t_context		*ctx;
+	double			t;
 
 	ctx = param;
 	controls(ctx);
+	t = ctx->time_rot;
+	if (ctx->colors == AMAZING)
+	{
+		ctx->color1 = rainbow_rgb(wrapf(time_color * 2.0f));
+		ctx->color2 = rainbow_rgb(wrapf(time_color * 2.0f + 1.0f));
+	}
+	if (ctx->spin == ON)
+	{
+		ctx->transform.rot = vec3((t * 0.5f), sinf(t * 0.1f), cosf(t*0.2f) - 1);
+		ctx->time_rot += ctx->mlx->delta_time;
+	}
+	time_color += ctx->mlx->delta_time;
 	render(ctx);
 }
 
@@ -68,10 +82,21 @@ static inline void	input(mlx_key_data_t keydata, void *param)
 		else if (ctx->cam.projection == ORTHOGRAPHIC)
 			ctx->cam.projection = PERSPECTIVE;
 		else if (ctx->cam.projection == PERSPECTIVE)
+		{
+			ctx->spin = OFF;
 			ctx->cam.projection = ISOMETRIC;
+			reset_transforms(ctx);
+		}
 	}
 	if (keydata.key == MLX_KEY_F && keydata.action == MLX_RELEASE)
-		focus(ctx);
+		frame(ctx);
+	if (keydata.key == MLX_KEY_C && keydata.action == MLX_RELEASE)
+		ctx->colors = !ctx->colors;
+	if (keydata.key == MLX_KEY_SPACE && keydata.action == MLX_RELEASE && \
+		ctx->cam.projection != ISOMETRIC)
+		ctx->spin = !ctx->spin;
+	if (keydata.key == MLX_KEY_R && keydata.action == MLX_RELEASE)
+		reset_transforms(ctx);
 }
 
 static inline void pan(t_cam *cam, float dx, float dy)
@@ -97,19 +122,20 @@ static inline void zoom(t_cam *cam, float delta)
 
 	speed = cam->distance * 0.1f;
 	cam->distance = fmaxf(0.1f, cam->distance - delta * speed);
+	cam->ortho_size = cam->distance * 0.5f;
 }
 
 static inline void	controls(void *param)
 {
 	t_context	*ctx;
-	t_vec2		pos;
-	t_vec2		d;
+	t_vec2i		pos;
+	t_vec2i		d;
 	float		sensitivity = 0.005f;
 	static double prev_x = -1;
-    static double prev_y = -1;
-    static bool zooming = false;
+	static double prev_y = -1;
+	static bool zooming = false;
 
-	d = vec2(0, 0);
+	d = vec2i(0, 0);
 	ctx = param;
 	if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
 		mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_LEFT) && \
@@ -160,4 +186,13 @@ static inline void	controls(void *param)
 		mlx_set_cursor_mode(ctx->mlx, MLX_MOUSE_NORMAL);
 		zooming = false;
 	}
+	if (mlx_is_key_down(ctx->mlx, MLX_KEY_W))
+		ctx->transform.pos.z -= ctx->mlx->delta_time * 4.0f;
+	if (mlx_is_key_down(ctx->mlx, MLX_KEY_S))
+		ctx->transform.pos.z += ctx->mlx->delta_time * 4.0f;
+	if (mlx_is_key_down(ctx->mlx, MLX_KEY_A))
+		ctx->transform.pos.x -= ctx->mlx->delta_time * 4.0f;
+	if (mlx_is_key_down(ctx->mlx, MLX_KEY_D))
+		ctx->transform.pos.x += ctx->mlx->delta_time * 4.0f;
+
 }
