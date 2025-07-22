@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:09:05 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/21 14:48:45 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/22 19:10:56 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,14 @@ void	clear_image(t_context *ctx, uint32_t color)
 	i = 0;
 	while (i < width)
 	{
-		pixels[i++] = color;
 		ctx->z_buf[i] = INFINITY;
+		pixels[i] = color;
+		++i;
 	}
 	i = 1;
 	while (i < height)
 	{
-		ft_memcpy(&pixels[i * width], pixels, width * sizeof (uint32_t ));
+		ft_memcpy(&pixels[i * width], pixels, width * sizeof (uint32_t));
 		ft_memcpy(&ctx->z_buf[i * width], ctx->z_buf, width * sizeof (float));
 		++i;
 	}
@@ -39,9 +40,9 @@ void	clear_image(t_context *ctx, uint32_t color)
 
 uint32_t	lerp_color(uint32_t c1, uint32_t c2, float t)
 {
-	t_color color1;
-	t_color color2;
-	t_color color;
+	t_color	color1;
+	t_color	color2;
+	t_color	color;
 
 	color1.r = (c1 >> 24) & 0xFF;
 	color1.g = (c1 >> 16) & 0xFF;
@@ -63,7 +64,7 @@ void	update_ui(t_context *ctx)
 	static mlx_image_t	*proj;
 	static mlx_image_t	*info;
 	static mlx_image_t	*controls;
-	char *str;
+	char				*str;
 
 	if (proj)
 		mlx_delete_image(ctx->mlx, proj);
@@ -90,7 +91,7 @@ void	update_ui(t_context *ctx)
 void	update_ui_2(t_context *ctx)
 {
 	static mlx_image_t	*info;
-	char *str;
+	char				*str;
 
 	if (info)
 		mlx_delete_image(ctx->mlx, info);

@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 19:29:14 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/22 00:33:46 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/22 19:10:27 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	control_camera(void *param)
 		orbit(ctx);
 		zoom(ctx);
 		if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
-			mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_MIDDLE))
+mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_MIDDLE))
 		{
 			mlx_get_mouse_pos(ctx->mlx, &pos.x, &pos.y);
 			if (prev.x >= 0 && prev.y >= 0)
@@ -74,7 +74,7 @@ static inline void	orbit(t_context *ctx)
 	t_vec2i			d;
 
 	if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
-		mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_LEFT))
+mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_LEFT))
 	{
 		mlx_get_mouse_pos(ctx->mlx, &pos.x, &pos.y);
 		if (prev.x >= 0 && prev.y >= 0)
@@ -113,7 +113,7 @@ static inline void	zoom(t_context *ctx)
 	float			delta;
 
 	if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
-		mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_RIGHT))
+mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_RIGHT))
 	{
 		mlx_get_mouse_pos(ctx->mlx, &pos.x, &pos.y);
 		if (prev.y == 0)

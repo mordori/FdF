@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:14:56 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/21 23:56:06 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/22 19:10:43 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
  */
 t_vertex	*make_vert(float x, float y, float z, uint32_t color)
 {
-	t_vertex *v;
+	t_vertex	*v;
 
 	v = malloc(sizeof (t_vertex));
 	if (!v)
@@ -45,8 +45,8 @@ bool	make_triangles(t_vector *tris, t_vec2i rows_cols)
 {
 	t_vec3	*tri;
 	t_quad	q;
-	int row;
-	int col;
+	int		row;
+	int		col;
 	size_t	i;
 
 	i = 0;
@@ -80,7 +80,7 @@ bool	make_triangles(t_vector *tris, t_vec2i rows_cols)
  */
 t_vec3	*make_tri(int x, int y, int z)
 {
-	t_vec3 *vec;
+	t_vec3	*vec;
 
 	vec = malloc(sizeof (t_vec3));
 	if (!vec)

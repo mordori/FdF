@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:24:31 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/21 18:21:55 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/22 19:10:33 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,13 @@ void	resize(int width, int height, void *param)
 	t_context	*ctx;
 
 	ctx = param;
-	if (!mlx_resize_image(ctx->img, width, height))
+	if (!ctx || !ctx->mlx || !ctx->img || width == 0 || height == 0)
+		return ;
+	free(ctx->z_buf);
+	ctx->z_buf = malloc(sizeof (float) * width * height);
+	if (!ctx->img || !ctx->z_buf || !mlx_resize_image(ctx->img, width, height))
 	{
-		if (ctx)
-			fdf_free(ctx->verts, ctx->tris, ctx);
+		fdf_free(ctx->verts, ctx->tris, ctx);
 		ft_error(ctx->mlx, "resizing img failed");
 	}
 	frame(ctx);

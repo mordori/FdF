@@ -6,16 +6,16 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:04:16 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/21 00:45:08 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/22 19:10:49 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
+static inline int			parse_data(char **elem, t_vector *verts, int row);
+static inline int			init_line(char *line, char ***elements);
 static inline uint32_t	parse_color(const char *str);
-static inline int	parse_data(char **elem, t_vector *verts, int row);
-static inline int	init_line(char *line, char ***elements);
-static inline void	free_parse(char *line, char **elements);
+static inline void		free_parse(char *line, char **elements);
 
 int	parse_map(char *map, t_vector *verts, t_vec2i *rows_cols)
 {

@@ -6,11 +6,12 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 13:45:24 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/22 11:23:35 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/22 19:10:31 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
+#include "fdf_2.h"
 
 static inline void	compute_distance(t_context *ctx);
 
@@ -38,7 +39,7 @@ void	frame(t_context *ctx)
 void	update_camera(t_cam *cam)
 {
 	const float	limit = M_PI_2 - 0.001f;
-	t_vec3	dir;
+	t_vec3		dir;
 
 	if (cam->pitch > limit)
 		cam->pitch = limit;

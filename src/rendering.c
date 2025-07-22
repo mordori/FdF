@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:08:26 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/22 00:55:33 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/22 19:11:01 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ void	render(void *param)
 	while (i < ctx->tris->total)
 	{
 		if (i % 2 == 0 || \
-			(i / (2 * v_rc.y) == (size_t)v_rc.x - 1 && i % 2) || \
-			((i / 2) % v_rc.y == (size_t)v_rc.y - 1 && i % 2))
+(i / (2 * v_rc.y) == (size_t)v_rc.x - 1 && i % 2) || \
+((i / 2) % v_rc.y == (size_t)v_rc.y - 1 && i % 2))
 		{
 			index = vector_get(ctx->tris, i);
 			render_line(ctx, index->x, index->y);
@@ -148,10 +148,10 @@ static inline void	drawpixel(t_context *ctx, t_vertex v0, uint32_t c, float z)
 	x = v0.screen.x;
 	y = v0.screen.y;
 	if (x >= 0 && x < (int)ctx->img->width && \
-		y >= 0 && y < (int)ctx->img->height)
+y >= 0 && y < (int)ctx->img->height)
 	{
 		index = y * ctx->img->width + x;
-		if(z < ctx->z_buf[index])
+		if (z < ctx->z_buf[index])
 		{
 			ctx->z_buf[index] = z;
 			mlx_put_pixel(ctx->img, x, y, c);

@@ -6,11 +6,12 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:51 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/22 01:42:23 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/22 19:10:46 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
+#include "fdf_2.h"
 
 static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img);
 static inline void	apply_corrections(t_context *ctx);
@@ -41,7 +42,7 @@ void	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
 		return (fdf_free(verts, tris, NULL), ft_error(mlx, "map parse"));
 	if (!vector_init(tris, true))
 		return (fdf_free(verts, tris, NULL), ft_error(mlx, "tris init"));
-	if(!make_triangles(tris, rows_cols))
+	if (!make_triangles(tris, rows_cols))
 		return (fdf_free(verts, tris, NULL), ft_error(mlx, "tris fill"));
 	*ctx = malloc(sizeof (t_context));
 	if (!*ctx)
@@ -103,7 +104,7 @@ static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img)
 	t_vertex	v;
 
 	ctx->z_buf = malloc(sizeof(float) * img->width * img->height);
-	if(!ctx->z_buf)
+	if (!ctx->z_buf)
 		return (fdf_free(ctx->verts, ctx->tris, ctx), ft_error(mlx, "z alloc"));
 	i = 0;
 	while (i < img->width * img->height)
@@ -161,9 +162,10 @@ void	reset_transforms(t_context *ctx)
 	ctx->transform.rot = vec3_n(0.0f);
 	ctx->transform.scale = vec3_n(1.0f);
 	ctx->cam.yaw = M_PI / 4.0f;
-	ctx->cam.yaw = 0;
 	ctx->cam.pitch = atanf(1.0f / sqrtf(2.0f));
-	ctx->cam.pitch = 0;
+	//ctx->cam.pitch = 0;
+	//ctx->cam.yaw = 0;
+	//ctx->cam.fov = 0.01f;
 	ctx->time_rot = 0.0;
 	frame(ctx);
 }

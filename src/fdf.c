@@ -6,11 +6,12 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/22 11:06:53 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/22 19:10:36 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
+#include "fdf_2.h"
 
 static inline void	loop(void *param);
 static inline void	input(mlx_key_data_t keydata, void *param);
@@ -23,6 +24,8 @@ static inline void	input(mlx_key_data_t keydata, void *param);
  * - Flipped projection with some axis rotations.
  *
  * - Clipping is implemented only partially.
+ *
+ * - Lines on the last row and column are rendered twice.
  *
  * - Final pixel color on a line off by 1 stop from v1.
  *
@@ -43,11 +46,11 @@ int	main(int argc, char *argv[])
 
 	if (argc != 2)
 		return (ft_error(NULL, "arguments"), EXIT_FAILURE);
-	mlx_set_setting(MLX_FULLSCREEN, true);
+	mlx_set_setting(MLX_MAXIMIZED, true);
 	mlx = mlx_init(WIDTH, HEIGHT, "FdF", true);
 	if (!mlx)
 		ft_error(NULL, "mlx alloc");
-	img  = mlx_new_image(mlx, mlx->width, mlx->height);
+	img = mlx_new_image(mlx, mlx->width, mlx->height);
 	if (!img || (mlx_image_to_window(mlx, img, 0, 0) < 0))
 		ft_error(mlx, "img alloc");
 	initialize(argv[1], &ctx, mlx, img);
@@ -72,6 +75,8 @@ static inline void	loop(void *param)
 	double			t;
 
 	ctx = param;
+	if (!ctx->img)
+		return ;
 	control_camera(ctx);
 	t = ctx->time_rot;
 	if (ctx->colors == AMAZING)
@@ -81,9 +86,9 @@ static inline void	loop(void *param)
 	}
 	if (ctx->spin == ON)
 	{
-		//ctx->transform.rot = vec3((t * 0.5f), sinf(t * 0.1f), cosf(t*0.2f) - 1);
-		ctx->transform.rot = vec3((M_PI_2), cosf(t*0.2f) - 1, sinf(M_PI_2));
-		//printf("%f\n", cosf(t*0.2f) - 1);
+		ctx->transform.rot.x = t * 0.5f;
+		ctx->transform.rot.y = sinf(t * 0.1f);
+		ctx->transform.rot.z = cosf(t * 0.2f) - 1;
 		ctx->time_rot += ctx->mlx->delta_time;
 	}
 	time_color += ctx->mlx->delta_time;
@@ -114,7 +119,7 @@ static inline void	input(mlx_key_data_t keydata, void *param)
 	if (ctx->cam.projection != ISOMETRIC)
 	{
 		if (keydata.key == MLX_KEY_F && keydata.action == MLX_RELEASE && \
-			ctx->spin == OFF)
+ctx->spin == OFF)
 			frame(ctx);
 		if (keydata.key == MLX_KEY_SPACE && keydata.action == MLX_RELEASE)
 			ctx->spin = !ctx->spin;
@@ -122,6 +127,3 @@ static inline void	input(mlx_key_data_t keydata, void *param)
 			reset_transforms(ctx);
 	}
 }
-
-
-
