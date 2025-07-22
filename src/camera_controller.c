@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 19:29:14 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/20 21:45:33 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/22 00:33:46 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,44 +26,45 @@ void	control_camera(void *param)
 
 	delta = vec2i(0, 0);
 	ctx = param;
-	translate_rotate(ctx);
-	orbit(ctx);
-	zoom(ctx);
-	if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
-		mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_MIDDLE))
+	if (ctx->cam.projection != ISOMETRIC)
 	{
-		mlx_get_mouse_pos(ctx->mlx, &pos.x, &pos.y);
-		if (prev.x >= 0 && prev.y >= 0)
-			delta = vec2i_sub(pos, prev);
-		pan(&ctx->cam, delta);
-		update_camera(&ctx->cam);
-		prev = pos;
+		if (ctx->spin == OFF)
+			translate_rotate(ctx);
+		orbit(ctx);
+		zoom(ctx);
+		if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
+			mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_MIDDLE))
+		{
+			mlx_get_mouse_pos(ctx->mlx, &pos.x, &pos.y);
+			if (prev.x >= 0 && prev.y >= 0)
+				delta = vec2i_sub(pos, prev);
+			pan(&ctx->cam, delta);
+			update_camera(&ctx->cam);
+			prev = pos;
+		}
+		else
+			prev = vec2i_n(-1);
 	}
-	else
-		prev = vec2i_n(-1);
 }
 
 static inline void	translate_rotate(t_context *ctx)
 {
-	if (ctx->cam.projection != ISOMETRIC)
-	{
-		if (mlx_is_key_down(ctx->mlx, MLX_KEY_W))
-			ctx->transform.pos.z -= ctx->mlx->delta_time * 4.0f;
-		if (mlx_is_key_down(ctx->mlx, MLX_KEY_S))
-			ctx->transform.pos.z += ctx->mlx->delta_time * 4.0f;
-		if (mlx_is_key_down(ctx->mlx, MLX_KEY_A))
-			ctx->transform.pos.x -= ctx->mlx->delta_time * 4.0f;
-		if (mlx_is_key_down(ctx->mlx, MLX_KEY_D))
-			ctx->transform.pos.x += ctx->mlx->delta_time * 4.0f;
-		if (mlx_is_key_down(ctx->mlx, MLX_KEY_UP))
-			ctx->transform.rot.x -= ctx->mlx->delta_time;
-		if (mlx_is_key_down(ctx->mlx, MLX_KEY_DOWN))
-			ctx->transform.rot.x += ctx->mlx->delta_time;
-		if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT))
-			ctx->transform.rot.y -= ctx->mlx->delta_time;
-		if (mlx_is_key_down(ctx->mlx, MLX_KEY_RIGHT))
-			ctx->transform.rot.y += ctx->mlx->delta_time;
-	}
+	if (mlx_is_key_down(ctx->mlx, MLX_KEY_W))
+		ctx->transform.pos.z -= ctx->mlx->delta_time * 4.0f;
+	if (mlx_is_key_down(ctx->mlx, MLX_KEY_S))
+		ctx->transform.pos.z += ctx->mlx->delta_time * 4.0f;
+	if (mlx_is_key_down(ctx->mlx, MLX_KEY_A))
+		ctx->transform.pos.x -= ctx->mlx->delta_time * 4.0f;
+	if (mlx_is_key_down(ctx->mlx, MLX_KEY_D))
+		ctx->transform.pos.x += ctx->mlx->delta_time * 4.0f;
+	if (mlx_is_key_down(ctx->mlx, MLX_KEY_UP))
+		ctx->transform.rot.x -= ctx->mlx->delta_time;
+	if (mlx_is_key_down(ctx->mlx, MLX_KEY_DOWN))
+		ctx->transform.rot.x += ctx->mlx->delta_time;
+	if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT))
+		ctx->transform.rot.z -= ctx->mlx->delta_time;
+	if (mlx_is_key_down(ctx->mlx, MLX_KEY_RIGHT))
+		ctx->transform.rot.z += ctx->mlx->delta_time;
 }
 
 static inline void	orbit(t_context *ctx)
@@ -73,8 +74,7 @@ static inline void	orbit(t_context *ctx)
 	t_vec2i			d;
 
 	if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
-		mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_LEFT) && \
-		ctx->cam.projection != ISOMETRIC)
+		mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_LEFT))
 	{
 		mlx_get_mouse_pos(ctx->mlx, &pos.x, &pos.y);
 		if (prev.x >= 0 && prev.y >= 0)
@@ -103,8 +103,6 @@ static inline void	pan(t_cam *cam, t_vec2i d)
 	up = vec3_normalize(vec3_cross(right, forward));
 	cam->target = vec3_add(cam->target, vec3_scale(right, -d.x * speed));
 	cam->target = vec3_add(cam->target, vec3_scale(up, d.y * speed));
-	cam->eye = vec3_add(cam->eye, vec3_scale(right, -d.x * speed));
-	cam->eye = vec3_add(cam->eye, vec3_scale(up, d.y * speed));
 }
 
 static inline void	zoom(t_context *ctx)

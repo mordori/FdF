@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:18:33 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/21 00:05:50 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/22 11:35:17 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ static inline t_mat4	view_matrix(t_cam cam);
 static inline t_mat4	proj_persp(t_cam cam);
 static inline t_mat4	proj_ortho(t_cam cam);
 
-bool	mvp(t_vertex *vert, t_context *ctx)
+bool	vert_to_screen(t_vertex *vert, t_context *ctx)
 {
 	t_matrices	m;
 	t_vec4		v_clip;
@@ -24,9 +24,8 @@ bool	mvp(t_vertex *vert, t_context *ctx)
 
 	m.m = model_matrix(ctx);
 	m.v = view_matrix(ctx->cam);
-	if (ctx->cam.projection == PERSPECTIVE)
-		m.p = proj_persp(ctx->cam);
-	else
+	m.p = proj_persp(ctx->cam);
+	if (ctx->cam.projection != PERSPECTIVE)
 		m.p = proj_ortho(ctx->cam);
 	m.mvp = mat4_mul(m.p, mat4_mul(m.v, m.m));
 	v_clip = mat4_mul_vec4(m.mvp, vert->pos);

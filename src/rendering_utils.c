@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:09:05 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/21 00:01:02 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/21 14:48:45 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,19 +71,19 @@ void	update_ui(t_context *ctx)
 		mlx_delete_image(ctx->mlx, info);
 	if (controls)
 		mlx_delete_image(ctx->mlx, controls);
-	str = "[ALT]+[MMB]pan   [ALT]+[RMB]zoom";
 	if (ctx->cam.projection == ISOMETRIC)
 		proj = mlx_put_string(ctx->mlx, "Isometric", 100, 60);
-	else
-		str = "[ALT]+[MMB]pan   [ALT]+[RMB]zoom   [ALT]+[LMB]orbit";
 	if (ctx->cam.projection == ORTHOGRAPHIC)
 		proj = mlx_put_string(ctx->mlx, "Orthographic", 100, 60);
 	if (ctx->cam.projection == PERSPECTIVE)
 		proj = mlx_put_string(ctx->mlx, "Perspective", 100, 60);
-	controls = mlx_put_string(ctx->mlx, str, 100, ctx->mlx->height - 75);
-	str = "[ESC]quit   [C]color   [P]projection   [F]frame";
-	info = mlx_put_string(ctx->mlx, str, 100, ctx->mlx->height - 110);
+	str = "[ESC]quit  [C]color  [P]projection";
+	info = mlx_put_string(ctx->mlx, str, 100, ctx->mlx->height - 75);
 	info->instances[0].z = 101;
+	str = "[ALT]+[MMB]pan   [ALT]+[RMB]zoom   [ALT]+[LMB]orbit";
+	if (ctx->cam.projection == ISOMETRIC)
+		str = " ";
+	controls = mlx_put_string(ctx->mlx, str, 100, ctx->mlx->height - 110);
 	controls->instances[0].z = 102;
 }
 
@@ -94,9 +94,9 @@ void	update_ui_2(t_context *ctx)
 
 	if (info)
 		mlx_delete_image(ctx->mlx, info);
-	str = "[R]reset   [WASD]translate   [ARROWS]rotate   [SPACE]spin";
+	str = "[WASD]translate  [ARROWS]rotate  [SPACE]spin  [F]frame  [R]reset";
 	if (ctx->cam.projection == ISOMETRIC)
-		str = "[R]reset   [WASD]translate";
+		str = " ";
 	info = mlx_put_string(ctx->mlx, str, 100, ctx->mlx->height - 145);
 	info->instances[0].z = 103;
 }

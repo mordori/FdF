@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/21 00:57:56 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/22 11:06:53 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,23 @@ static inline void	loop(void *param);
 static inline void	input(mlx_key_data_t keydata, void *param);
 
 /**
- * Initializes mlx, render img, sets the loop hooks, and begins initializing
- * the scene context.
+ * Simple wireframe model software renderer with limited file parsing.
  *
+ * Known flaws:
+ *
+ * - Flipped projection with some axis rotations.
+ *
+ * - Clipping is implemented only partially.
+ *
+ * - Final pixel color on a line off by 1 stop from v1.
+ *
+ * - Inadequate performance with higher vertex amounts,
+ * probably due to the use of too many instructions and dynamic vector arrays.
+ *
+ * Main initializes mlx context, render imgage, sets the loop hooks,
+ * and begins model initialization.
+ *
+ * @param argc Arguments count.
  * @param argv File path e.g. "maps/42.fdf"
  */
 int	main(int argc, char *argv[])
@@ -28,7 +42,7 @@ int	main(int argc, char *argv[])
 	t_context	*ctx;
 
 	if (argc != 2)
-		return (ft_error(mlx, "arguments"), EXIT_FAILURE);
+		return (ft_error(NULL, "arguments"), EXIT_FAILURE);
 	mlx_set_setting(MLX_FULLSCREEN, true);
 	mlx = mlx_init(WIDTH, HEIGHT, "FdF", true);
 	if (!mlx)
@@ -39,7 +53,7 @@ int	main(int argc, char *argv[])
 	initialize(argv[1], &ctx, mlx, img);
 	mlx_loop_hook(mlx, loop, ctx);
 	mlx_key_hook(mlx, input, ctx);
-	mlx_resize_hook(mlx, on_resize, ctx);
+	mlx_resize_hook(mlx, resize, ctx);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
 	fdf_free(ctx->verts, ctx->tris, ctx);
@@ -47,9 +61,9 @@ int	main(int argc, char *argv[])
 }
 
 /**
- * Main loop for camera updates and rendering.
+ * Main loop for camera update and rendering.
  *
- * @param param Scene context.
+ * @param param Model context.
  */
 static inline void	loop(void *param)
 {
@@ -67,7 +81,9 @@ static inline void	loop(void *param)
 	}
 	if (ctx->spin == ON)
 	{
-		ctx->transform.rot = vec3((t * 0.5f), sinf(t * 0.1f), cosf(t*0.2f) - 1);
+		//ctx->transform.rot = vec3((t * 0.5f), sinf(t * 0.1f), cosf(t*0.2f) - 1);
+		ctx->transform.rot = vec3((M_PI_2), cosf(t*0.2f) - 1, sinf(M_PI_2));
+		//printf("%f\n", cosf(t*0.2f) - 1);
 		ctx->time_rot += ctx->mlx->delta_time;
 	}
 	time_color += ctx->mlx->delta_time;
@@ -78,7 +94,7 @@ static inline void	loop(void *param)
  * Loop hook for discrete input commands.
  *
  * @param keydata Mlx key data.
- * @param param Scene context.
+ * @param param Model context.
  */
 static inline void	input(mlx_key_data_t keydata, void *param)
 {
@@ -93,15 +109,18 @@ static inline void	input(mlx_key_data_t keydata, void *param)
 		if (ctx->cam.projection == ISOMETRIC)
 			reset_transforms(ctx);
 	}
-	if (keydata.key == MLX_KEY_F && keydata.action == MLX_RELEASE)
-		frame(ctx);
 	if (keydata.key == MLX_KEY_C && keydata.action == MLX_RELEASE)
 		ctx->colors = !ctx->colors;
-	if (keydata.key == MLX_KEY_SPACE && keydata.action == MLX_RELEASE && \
-		ctx->cam.projection != ISOMETRIC)
-		ctx->spin = !ctx->spin;
-	if (keydata.key == MLX_KEY_R && keydata.action == MLX_RELEASE)
-		reset_transforms(ctx);
+	if (ctx->cam.projection != ISOMETRIC)
+	{
+		if (keydata.key == MLX_KEY_F && keydata.action == MLX_RELEASE && \
+			ctx->spin == OFF)
+			frame(ctx);
+		if (keydata.key == MLX_KEY_SPACE && keydata.action == MLX_RELEASE)
+			ctx->spin = !ctx->spin;
+		if (keydata.key == MLX_KEY_R && keydata.action == MLX_RELEASE)
+			reset_transforms(ctx);
+	}
 }
 
 

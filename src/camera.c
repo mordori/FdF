@@ -6,15 +6,35 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 13:45:24 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/20 22:18:24 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/22 11:23:35 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
 static inline void	compute_distance(t_context *ctx);
-static inline void	compute_bounds(t_context *ctx);
 
+/**
+ * Initializes and updates the camera with computed distance.
+ *
+ * @param ctx Model context.
+ */
+void	frame(t_context *ctx)
+{
+	t_vertex	v;
+
+	ctx->cam.aspect = (float)ctx->mlx->width / ctx->mlx->height;
+	compute_bounds(ctx, WORLD, 0, &v);
+	ctx->cam.target = ctx->center;
+	compute_distance(ctx);
+	update_camera(&ctx->cam);
+}
+
+/**
+ * Initializes and updates the camera with computed distance.
+ *
+ * @param cam Camera.
+ */
 void	update_camera(t_cam *cam)
 {
 	const float	limit = M_PI_2 - 0.001f;
@@ -30,22 +50,31 @@ void	update_camera(t_cam *cam)
 	cam->eye = vec3_add(cam->target, vec3_scale(dir, cam->distance));
 }
 
-void	init_camera(t_context *ctx, t_vec3 target)
+/**
+ * Initializes and updates the camera with computed distance.
+ *
+ * @param ctx Model context.
+ */
+void	init_camera(t_context *ctx)
 {
 	ctx->cam.projection = ISOMETRIC;
-	ctx->cam.target = target;
-	ctx->cam.distance = 1.0f;
+	ctx->cam.aspect = (float)ctx->mlx->width / ctx->mlx->height;
+	ctx->cam.target = vec3_n(0.0f);
+	ctx->cam.up = vec3(0.0f, 1.0f, 0.0f);
 	ctx->cam.yaw = M_PI / 4.0f;
 	ctx->cam.pitch = atanf(1.0f / sqrtf(2.0f));
-	ctx->cam.up = vec3(0.0f, 1.0f, 0.0f);
 	ctx->cam.fov = M_PI / 2.5f;
-	ctx->cam.aspect = (float)ctx->mlx->width / ctx->mlx->height;
 	ctx->cam.near = 0.1f;
 	ctx->cam.far = 100.0f;
 	compute_distance(ctx);
 	update_camera(&ctx->cam);
 }
 
+/**
+ * Initializes and updates the camera with computed distance.
+ *
+ * @param ctx Model context.
+ */
 static inline void	compute_distance(t_context *ctx)
 {
 	float	max_dim;
@@ -61,38 +90,4 @@ static inline void	compute_distance(t_context *ctx)
 		ctx->cam.ortho_size = max_dim * 0.5f;
 		ctx->cam.distance = max_dim;
 	}
-}
-
-static inline void	compute_bounds(t_context *ctx)
-{
-	t_vertex	*v;
-	t_vec4		pos;
-	size_t		i;
-	t_mat4		m;
-
-	m = model_matrix(ctx);
-	ctx->min = vec3(FLT_MAX, FLT_MAX, FLT_MAX);
-	ctx->max = vec3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-	i = 0;
-	while (i < ctx->verts->total)
-	{
-		v = vector_get(ctx->verts, i++);
-		pos = mat4_mul_vec4(m, v->pos);
-		ctx->min.x = fminf(ctx->min.x, pos.x);
-		ctx->min.y = fminf(ctx->min.y, pos.y);
-		ctx->min.z = fminf(ctx->min.z, pos.z);
-		ctx->max.x = fmaxf(ctx->max.x, pos.x);
-		ctx->max.y = fmaxf(ctx->max.y, pos.y);
-		ctx->max.z = fmaxf(ctx->max.z, pos.z);
-	}
-}
-
-void	frame(t_context *ctx)
-{
-	compute_bounds(ctx);
-	ctx->center = vec3_scale(vec3_add(ctx->min, ctx->max), 0.5f);
-	ctx->bounds = vec3_sub(ctx->max, ctx->min);
-	ctx->cam.target = ctx->center;
-	compute_distance(ctx);
-	update_camera(&ctx->cam);
 }

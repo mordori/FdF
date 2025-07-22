@@ -6,30 +6,40 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:24:31 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/21 00:34:30 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/21 18:21:55 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-void	on_resize(int width, int height, void *param)
+/**
+ * Resize hook, sets the render image to new dimensions.
+ * Frames the model with the new aspect.
+ *
+ * @param width New window width.
+ * @param height New window height.
+ * @param param Model context.
+ */
+void	resize(int width, int height, void *param)
 {
 	t_context	*ctx;
 
 	ctx = param;
-	if (ctx->img)
-		mlx_delete_image(ctx->mlx, ctx->img);
-	ctx->img = mlx_new_image(ctx->mlx, width, height);
-	if (!ctx->img || (mlx_image_to_window(ctx->mlx, ctx->img, 0, 0) < 0))
+	if (!mlx_resize_image(ctx->img, width, height))
 	{
-		if (ctx && ctx->verts && ctx->tris)
+		if (ctx)
 			fdf_free(ctx->verts, ctx->tris, ctx);
-		ft_error(ctx->mlx, "mlx: resize image failed");
+		ft_error(ctx->mlx, "resizing img failed");
 	}
-	ctx->cam.aspect = (float)ctx->mlx->width / ctx->mlx->height;
 	frame(ctx);
 }
 
+/**
+ * Logs errors on stderr and terminates mlx before exiting.
+ *
+ * @param mlx Mlx context.
+ * @param message Error message.
+ */
 void	ft_error(mlx_t *mlx, char *message)
 {
 	ft_putstr_fd("Error: ", STDERR_FILENO);
@@ -43,6 +53,13 @@ void	ft_error(mlx_t *mlx, char *message)
 	exit(EXIT_FAILURE);
 }
 
+/**
+ * Frees the model context and `verts` `tris` vector arrays.
+ *
+ * @param verts Vertices vector array.
+ * @param tris Triangles vector array.
+ * @param ctx Model context.
+ */
 void	fdf_free(t_vector *verts, t_vector *tris, t_context *ctx)
 {
 	if (verts && verts->items)
@@ -51,6 +68,9 @@ void	fdf_free(t_vector *verts, t_vector *tris, t_context *ctx)
 		vector_free(tris);
 	free(verts);
 	free(tris);
-	free(ctx->z_buf);
-	free(ctx);
+	if (ctx)
+	{
+		free(ctx->z_buf);
+		free(ctx);
+	}
 }

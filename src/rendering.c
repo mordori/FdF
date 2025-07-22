@@ -6,13 +6,13 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:08:26 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/21 00:15:05 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/22 00:55:33 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-static inline void	renderline(t_context *ctx, int i1, int i2);
+static inline void	render_line(t_context *ctx, int i1, int i2);
 static inline void	drwline(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 o);
 static inline void	movepixel(t_vec2i *d, t_vec2i *s, t_vec2i *e, t_vertex *v0);
 static inline void	drawpixel(t_context *ctx, t_vertex v0, uint32_t c, float z);
@@ -35,8 +35,8 @@ void	render(void *param)
 			((i / 2) % v_rc.y == (size_t)v_rc.y - 1 && i % 2))
 		{
 			index = vector_get(ctx->tris, i);
-			renderline(ctx, index->x, index->y);
-			renderline(ctx, index->y, index->z);
+			render_line(ctx, index->x, index->y);
+			render_line(ctx, index->y, index->z);
 		}
 		++i;
 	}
@@ -44,28 +44,48 @@ void	render(void *param)
 	update_ui_2(ctx);
 }
 
-static inline void	renderline(t_context *ctx, int i1, int i2)
+/**
+ * Does not implement proper clipping yet.
+ * Line is rejected if both vertices are outside of the frustrum,
+ * or either is behind the camera.
+ * Pixels on a line outside the screen are not drawn, but they are computed.
+ */
+static inline void	render_line(t_context *ctx, int i1, int i2)
 {
 	t_vertex	*v0;
 	t_vertex	*v1;
-	bool		x_visible;
-	bool		y_visible;
+	t_vec2i		visible;
+	t_vec2i		s;
 	bool		v0_visible;
 
 	v0 = vector_get(ctx->verts, i1);
 	v1 = vector_get(ctx->verts, i2);
-	if (mvp(v0, ctx) && mvp(v1, ctx))
+	if (vert_to_screen(v0, ctx) && vert_to_screen(v1, ctx))
 	{
-		x_visible = v0->screen.x >= 0 && v0->screen.x < (int)ctx->img->width;
-		y_visible = v0->screen.y >= 0 && v0->screen.y < (int)ctx->img->height;
-		v0_visible = x_visible && y_visible;
-		x_visible = v1->screen.x >= 0 && v1->screen.x < (int)ctx->img->width;
-		y_visible = v1->screen.y >= 0 && v1->screen.y < (int)ctx->img->height;
-		if (v0_visible || (x_visible && y_visible))
+		ctx->color = v1->color;
+		s = v0->screen;
+		visible.x = s.x >= 0 && s.x < (int)ctx->img->width;
+		visible.y = s.y >= 0 && s.y < (int)ctx->img->height;
+		v0_visible = visible.x && visible.y;
+		s = v1->screen;
+		visible.x = s.x >= 0 && s.x < (int)ctx->img->width;
+		visible.y = s.y >= 0 && s.y < (int)ctx->img->height;
+		if (v0_visible || (visible.x && visible.y))
 			drwline(ctx, *v0, *v1, vec3(0.0f, v0->pos.y, v0->z));
 	}
 }
 
+/**
+ * Implements Bresenham's line algorithm with incremental error.
+ * Also lerps the pixel color and depth from vertex data.
+ * The final pixel color off by 1 step from v1 color.
+ *
+ * @param d
+ * @param s Slopes for x and y [-1 or 1]
+ * @param error
+ * @param steps Steps along the line. x is current, y is total steps.
+ * @param t
+ */
 static inline void	drwline(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 o)
 {
 	t_vec2i	d;
@@ -96,6 +116,10 @@ static inline void	drwline(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 o)
 	drawpixel(ctx, v0, ctx->color, o.z);
 }
 
+/**
+ * Moves the position of the pixel along the line.
+ * Determines if either x or y is incremented, based on the slope of the line
+ */
 static inline void	movepixel(t_vec2i *d, t_vec2i *s, t_vec2i *e, t_vertex *v0)
 {
 	e->y = 2 * e->x;
@@ -111,6 +135,10 @@ static inline void	movepixel(t_vec2i *d, t_vec2i *s, t_vec2i *e, t_vertex *v0)
 	}
 }
 
+/**
+ * Implements Bresenham's line algorithm.
+ * Also lerps the pixel color and depth from vertex data.
+ */
 static inline void	drawpixel(t_context *ctx, t_vertex v0, uint32_t c, float z)
 {
 	int	x;
