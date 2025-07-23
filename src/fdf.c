@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/22 19:10:36 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 06:23:25 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,21 +19,22 @@ static inline void	input(mlx_key_data_t keydata, void *param);
 /**
  * Simple wireframe model software renderer with limited file parsing.
  *
- * Known flaws:
+ * Main initializes mlx context, render imgage, sets the loop hooks,
+ * and begins model initialization.
  *
- * - Flipped projection with some axis rotations.
+ * Known flaws:
  *
  * - Clipping is implemented only partially.
  *
- * - Lines on the last row and column are rendered twice.
+ * - Lines on the last row and column of triangles are rendered twice.
  *
- * - Final pixel color on a line off by 1 stop from v1.
+ * - The final pixel color on a line is not exact to v1 color.
  *
  * - Inadequate performance with higher vertex amounts,
  * probably due to the use of too many instructions and dynamic vector arrays.
  *
- * Main initializes mlx context, render imgage, sets the loop hooks,
- * and begins model initialization.
+ * - Orthographic projections easily introduce an optical illusion where the
+ * model seemingly flips at certain camera angles.
  *
  * @param argc Arguments count.
  * @param argv File path e.g. "maps/42.fdf"
@@ -64,9 +65,10 @@ int	main(int argc, char *argv[])
 }
 
 /**
- * Main loop for camera update and rendering.
+ * Main loop for camera update, rendering, and ui update.
+ * Iterates the values used for spin and color features.
  *
- * @param param Model context.
+ * @param param Rendering context.
  */
 static inline void	loop(void *param)
 {
@@ -81,8 +83,8 @@ static inline void	loop(void *param)
 	t = ctx->time_rot;
 	if (ctx->colors == AMAZING)
 	{
-		ctx->color1 = rainbow_rgb(wrapf(-time_color * 2.0f + M_PI_2));
-		ctx->color2 = rainbow_rgb(wrapf(-time_color * 2.0f));
+		ctx->color1 = rainbow_rgb(-time_color * 2.0f + M_PI_2);
+		ctx->color2 = rainbow_rgb(-time_color * 2.0f);
 	}
 	if (ctx->spin == ON)
 	{
@@ -93,13 +95,29 @@ static inline void	loop(void *param)
 	}
 	time_color += ctx->mlx->delta_time;
 	render(ctx);
+	update_ui(ctx);
+	update_ui_2(ctx);
 }
 
 /**
  * Loop hook for discrete input commands.
  *
+ * Keys:
+ *
+ * -ESC exit program.
+ *
+ * -P switch projection.
+ *
+ * -C toggle color mode.
+ *
+ * -F frame the model.
+ *
+ * -SPACE toggle spin mode.
+ *
+ * -R reset model transform and camera angle.
+ *
  * @param keydata Mlx key data.
- * @param param Model context.
+ * @param param Rendering context.
  */
 static inline void	input(mlx_key_data_t keydata, void *param)
 {
@@ -118,8 +136,7 @@ static inline void	input(mlx_key_data_t keydata, void *param)
 		ctx->colors = !ctx->colors;
 	if (ctx->cam.projection != ISOMETRIC)
 	{
-		if (keydata.key == MLX_KEY_F && keydata.action == MLX_RELEASE && \
-ctx->spin == OFF)
+		if (keydata.key == MLX_KEY_F && keydata.action == MLX_RELEASE)
 			frame(ctx);
 		if (keydata.key == MLX_KEY_SPACE && keydata.action == MLX_RELEASE)
 			ctx->spin = !ctx->spin;

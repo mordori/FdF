@@ -6,12 +6,19 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:09:05 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/22 19:10:56 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 04:01:17 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
+/**
+ * Clears the render image pixels with a solid color and the Z-buffer.
+ * Sets the data for the first row, then copies it to the rest of rows.
+ *
+ * @param ctx Model context containing render image and Z-buffer.
+ * @param color Solid color.
+ */
 void	clear_image(t_context *ctx, uint32_t color)
 {
 	size_t		i;
@@ -38,6 +45,15 @@ void	clear_image(t_context *ctx, uint32_t color)
 	}
 }
 
+/**
+ * Interpolates two colors by first separating the color channels,
+ * then interpolates them, and finally combines everything back into a 32-bit
+ * RGBA color.
+ *
+ * @param c1 Color 1 (32-bit RBGA).
+ * @param c2 Color 2 (32-bit RBGA).
+ * @param t Time, controls the interpolation.
+ */
 uint32_t	lerp_color(uint32_t c1, uint32_t c2, float t)
 {
 	t_color	color1;
@@ -59,6 +75,11 @@ uint32_t	lerp_color(uint32_t c1, uint32_t c2, float t)
 	return ((color.r << 24) | (color.g << 16) | (color.b << 8) | color.a);
 }
 
+/**
+ * UI function for controls information.
+ *
+ * @param ctx Render context containing camera and mlx context.
+ */
 void	update_ui(t_context *ctx)
 {
 	static mlx_image_t	*proj;
@@ -88,6 +109,11 @@ void	update_ui(t_context *ctx)
 	controls->instances[0].z = 102;
 }
 
+/**
+ * Additional UI function for controls information.
+ *
+ * @param ctx Render context containing camera and mlx context.
+ */
 void	update_ui_2(t_context *ctx)
 {
 	static mlx_image_t	*info;
@@ -102,6 +128,12 @@ void	update_ui_2(t_context *ctx)
 	info->instances[0].z = 103;
 }
 
+/**
+ * Creates a color (32-bit RGBA) with offset channels that are iterated by
+ * a sine wave remapped to 0-1.
+ *
+ * @param t Time, controls the sine wave.
+ */
 uint32_t	rainbow_rgb(double t)
 {
 	float	r;

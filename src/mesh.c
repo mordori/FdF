@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:14:56 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/22 19:10:43 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 03:51:07 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,11 @@
 
 /**
  * Creates a memory allocated vertex from given position and color.
+ * Initializes w, screen coordinates, and depth.
  *
- * @param x X position.
- * @param y Y position.
- * @param z Z position.
+ * @param x X position in object space.
+ * @param y Y position in object space.
+ * @param z Z position in object space.
  * @param color Vertex color.
  * @return New vertex.
  */
@@ -30,6 +31,7 @@ t_vertex	*make_vert(float x, float y, float z, uint32_t color)
 		return (NULL);
 	v->pos = vec4(x, -y, z, 1.0f);
 	v->color = color;
+	v->s = vec2i(0, 0);
 	v->z = 0.0f;
 	return (v);
 }
@@ -37,7 +39,7 @@ t_vertex	*make_vert(float x, float y, float z, uint32_t color)
 /**
  * Fills a vector with triangles that hold vertex indices.
  *
- * @param tris Vector to be filled.
+ * @param tris Vector containing the triangles.
  * @param rows_cols A tuple containing number of vertex rows and columns.
  * @return True on success, false on error.
  */
@@ -73,9 +75,9 @@ bool	make_triangles(t_vector *tris, t_vec2i rows_cols)
 /**
  * Creates a memory allocated triangle from given indices.
  *
- * @param x Vertex 1.
- * @param y Vertex 2.
- * @param z Vertex 3.
+ * @param x Index for vertex 1.
+ * @param y Index for vertex 2.
+ * @param z Index for vertex 3.
  * @return New triangle.
  */
 t_vec3	*make_tri(int x, int y, int z)

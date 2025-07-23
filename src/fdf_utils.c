@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:24:31 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/22 19:10:33 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 03:52:50 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,11 @@
 
 /**
  * Resize hook, sets the render image to new dimensions.
- * Frames the model with the new aspect.
+ * Frames the rendering with the new aspect.
  *
  * @param width New window width.
  * @param height New window height.
- * @param param Model context.
+ * @param param Rendering context containing render image and Z-buffer.
  */
 void	resize(int width, int height, void *param)
 {
@@ -57,11 +57,11 @@ void	ft_error(mlx_t *mlx, char *message)
 }
 
 /**
- * Frees the model context and `verts` `tris` vector arrays.
+ * Frees the rendering context and `verts` `tris` vector arrays.
  *
  * @param verts Vertices vector array.
  * @param tris Triangles vector array.
- * @param ctx Model context.
+ * @param ctx Rendering context containing Z-buffer.
  */
 void	fdf_free(t_vector *verts, t_vector *tris, t_context *ctx)
 {

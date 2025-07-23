@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 13:45:24 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/22 19:10:31 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 05:23:24 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,19 @@
 static inline void	compute_distance(t_context *ctx);
 
 /**
- * Initializes and updates the camera with computed distance.
+ * Positions and updates the camera to frame the entire model within view.
  *
- * @param ctx Model context.
+ * - Computes the model bounds in WORLD space.
+ *
+ * - Updates the camera's aspect ratio based on the current window size.
+ *
+ * - Sets the camera's target to the model's center.
+ *
+ * - Computes an appropriate camera distance based on model bounds.
+ *
+ * - Calls `update_camera()` to apply pitch, yaw, and distance.
+ *
+ * @param ctx Rendering context containing the model and camera.
  */
 void	frame(t_context *ctx)
 {
@@ -32,9 +42,13 @@ void	frame(t_context *ctx)
 }
 
 /**
- * Initializes and updates the camera with computed distance.
+ * Updates the camera's eye based on its yaw, pitch, distance, and target.
  *
- * @param cam Camera.
+ * Constraints the pitch angle within (-π/2, π/2) to avoid gimbal lock.
+ * The camera's `eye` position is calculated relative to `target`
+ * using spherical coordinates defined by yaw, pitch, and distance.
+ *
+ * @param cam Pointer to the camera to update.
  */
 void	update_camera(t_cam *cam)
 {
@@ -52,9 +66,10 @@ void	update_camera(t_cam *cam)
 }
 
 /**
- * Initializes and updates the camera with computed distance.
+ * Initializes the camera with default values, then computes the camera distance
+ * based on the model's bounds and updates the camera's `eye` position.
  *
- * @param ctx Model context.
+ * @param ctx Rendering context containing model bounds and camera.
  */
 void	init_camera(t_context *ctx)
 {
@@ -67,14 +82,20 @@ void	init_camera(t_context *ctx)
 	ctx->cam.fov = M_PI / 2.5f;
 	ctx->cam.near = 0.1f;
 	ctx->cam.far = 100.0f;
+	ctx->cam.panning = false;
+	ctx->cam.zooming = false;
+	ctx->cam.orbiting = false;
 	compute_distance(ctx);
 	update_camera(&ctx->cam);
 }
 
 /**
- * Initializes and updates the camera with computed distance.
+ * Computes the appropriate camera distance or orthographic size
+ * needed to fit the model within the view frustum.
  *
- * @param ctx Model context.
+ * - A small padding factor (1.1x) is applied.
+ *
+ * @param ctx Rendering context containing the camera and model bounds.
  */
 static inline void	compute_distance(t_context *ctx)
 {

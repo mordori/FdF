@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 22:37:25 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/22 19:09:05 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 05:22:56 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,9 @@ typedef struct s_cam
 	float	far;
 	float	ortho_size;
 	t_proj	projection;
+	bool	zooming;
+	bool	panning;
+	bool	orbiting;
 }				t_cam;
 
 typedef struct s_matrices

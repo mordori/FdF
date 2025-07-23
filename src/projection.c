@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:18:33 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/22 19:10:51 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 01:03:35 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ bool	vert_to_screen(t_vertex *vert, t_context *ctx)
 	if (v_clip.w <= 0.0f)
 		return (false);
 	v_ndc = vec3_scale(vec3_4(v_clip), 1.0f / v_clip.w);
-	vert->screen.x = (v_ndc.x + 1.0f) * 0.5f * ctx->mlx->width;
-	vert->screen.y = (1.0f - v_ndc.y) * 0.5f * ctx->mlx->height;
+	vert->s.x = (v_ndc.x + 1.0f) * 0.5f * ctx->mlx->width;
+	vert->s.y = (1.0f - v_ndc.y) * 0.5f * ctx->mlx->height;
 	vert->z = (v_ndc.z + 1.0f) * 0.5f;
 	return (true);
 }

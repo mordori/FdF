@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:51 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/22 19:10:46 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 04:40:43 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,16 @@
 #include "fdf_2.h"
 
 static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img);
-static inline void	apply_corrections(t_context *ctx);
+static inline void	normalize_model(t_context *ctx);
 
 /**
- * Begins parsing the map file, initializes verts and tris vector arrays,
- * fills tris and beings initialing the model context.
+ * Parses the map file, initializes the vertex and triangle vectors,
+ * constructs the triangle list, and allocates the main rendering context.
  *
- * @param ctx Pointer to the model context.
+ * On failure, frees allocated resources and reports an error via `ft_error()`.
+ *
+ * @param file Path to the map file to load.
+ * @param ctx Rendering context.
  * @param mlx Mlx context.
  * @param img Render image.
  */
@@ -54,12 +57,13 @@ void	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
 }
 
 /**
- * Computes the min/max altitudes, the center and the bounds of the model,
- * and applies corrective translation and rotation to the vertices.
+ * Computes the axis-aligned bounding box (AABB) of the model by
+ * finding the minimum and maximum x, y, and z coordinates among all vertices.
  *
- * @param ctx Model context.
- * @param mlx Mlx context.
- * @param img Render image.
+ * @param ctx Rendering context.
+ * @param space Coordinate space in which bounds are computed (OBJECT or WORLD).
+ * @param i Auxiliary starting index in the vertex array (always 0).
+ * @param v Auxiliary vertex pointer.
  */
 void	compute_bounds(t_context *ctx, t_space space, size_t i, t_vertex *v)
 {
@@ -81,20 +85,31 @@ void	compute_bounds(t_context *ctx, t_space space, size_t i, t_vertex *v)
 		max.x = fmaxf(max.x, pos.x);
 		max.y = fmaxf(max.y, pos.y);
 		max.z = fmaxf(max.z, pos.z);
-		if (space == OBJECT)
-			ctx->alt_min_max.x = ft_imin(ctx->alt_min_max.x, pos.z);
-		if (space == OBJECT)
-			ctx->alt_min_max.y = ft_imax(ctx->alt_min_max.y, pos.z);
+		if (space != OBJECT)
+			continue ;
+		ctx->alt_min_max.x = ft_imin(ctx->alt_min_max.x, pos.z);
+		ctx->alt_min_max.y = ft_imax(ctx->alt_min_max.y, pos.z);
 	}
 	ctx->center = vec3_scale(vec3_add(min, max), 0.5f);
 	ctx->bounds = vec3_sub(max, min);
 }
 
 /**
- * Initializes the model context. Begins normalization of the model,
- * and initialization of the camera.
+ * Initializes the rendering context after loading vertices and triangles.
  *
- * @param ctx Model context.
+ * - Allocates and clears the Z-buffer.
+ *
+ * - Initializes default transform values (position, rotation, scale).
+ *
+ * - Computes initial object-space bounds and altitudes.
+ *
+ * - Normalizes the model (centers and rotates it).
+ *
+ * - Computes world-space bounds after normalization.
+ *
+ * - Initializes the camera.
+ *
+ * @param ctx Rendering context.
  * @param mlx Mlx context.
  * @param img Render image.
  */
@@ -122,20 +137,19 @@ static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img)
 	compute_bounds(ctx, OBJECT, 0, &v);
 	if (ctx->alt_min_max.x == ctx->alt_min_max.y)
 		ctx->alt_min_max.y = ctx->alt_min_max.x + 1;
-	apply_corrections(ctx);
+	normalize_model(ctx);
 	compute_bounds(ctx, WORLD, 0, &v);
 	init_camera(ctx);
 }
 
 /**
- * Computes the min/max altitudes, the center and the bounds of the model,
- * and applies corrective translation and rotation to the vertices.
+ * Normalizes the model by translating all vertices, placing the center
+ * of the model at the world origin, and rotating it around the
+ * X-axis by -90 degrees to align the model with the coordinate system.
  *
- * @param ctx Model context.
- * @param mlx Mlx context.
- * @param img Render image.
+ * @param ctx Rendering context containing the model vertices.
  */
-static inline void	apply_corrections(t_context *ctx)
+static inline void	normalize_model(t_context *ctx)
 {
 	t_vertex	*v;
 	size_t		i;
@@ -150,10 +164,17 @@ static inline void	apply_corrections(t_context *ctx)
 }
 
 /**
- * Resets model transform, camera pitch and yaw, turns spinning off,
- * and frames the model.
+ * Resets the model and camera to their default transform state:
  *
- * @param ctx Model context.
+ * - Disables spin.
+ *
+ * - Resets model translation, rotation, and scale to identity.
+ *
+ * - Resets camera yaw and pitch to default viewing angles.
+ *
+ * - Calls `frame()` to adjust the camera to fit the model in the render image.
+ *
+ * @param ctx Rendering context.
  */
 void	reset_transforms(t_context *ctx)
 {
@@ -163,9 +184,6 @@ void	reset_transforms(t_context *ctx)
 	ctx->transform.scale = vec3_n(1.0f);
 	ctx->cam.yaw = M_PI / 4.0f;
 	ctx->cam.pitch = atanf(1.0f / sqrtf(2.0f));
-	//ctx->cam.pitch = 0;
-	//ctx->cam.yaw = 0;
-	//ctx->cam.fov = 0.01f;
 	ctx->time_rot = 0.0;
 	frame(ctx);
 }

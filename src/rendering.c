@@ -6,17 +6,31 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:08:26 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/22 19:11:01 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 06:19:24 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-static inline void	render_line(t_context *ctx, int i1, int i2);
+static inline void	render_line(t_context *ctx, int idx0, int idx1);
 static inline void	drwline(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 o);
-static inline void	movepixel(t_vec2i *d, t_vec2i *s, t_vec2i *e, t_vertex *v0);
+static inline void	movepixel(t_vec2i *d, t_vec2i *s, int *error, t_vertex *v0);
 static inline void	drawpixel(t_context *ctx, t_vertex v0, uint32_t c, float z);
 
+/**
+ * Renders the wireframe grid from the triangle list.
+ *
+ * Clears the render image first to a solid color and default the Z-buffer.
+ *
+ * Then, for every tringle in the mesh:
+ *
+ * - For every second triangle, top and left edges are drawn.
+ *
+ * - For tringles in the last row or last column, edges as drawn for both
+ * triangles to ensure the boundary lines are rendered.
+ *
+ * @param param Rendering context.
+ */
 void	render(void *param)
 {
 	size_t		i;
@@ -40,17 +54,21 @@ void	render(void *param)
 		}
 		++i;
 	}
-	update_ui(ctx);
-	update_ui_2(ctx);
 }
 
 /**
  * Does not implement proper clipping yet.
+ *
  * Line is rejected if both vertices are outside of the frustrum,
  * or either is behind the camera.
+ *
  * Pixels on a line outside the screen are not drawn, but they are computed.
+ *
+ * @param ctx Rendering context containing vertices, render image, and color.
+ * @param idx0 Index for vertex 0.
+ * @param idx1 Index for vertex 1.
  */
-static inline void	render_line(t_context *ctx, int i1, int i2)
+static inline void	render_line(t_context *ctx, int idx0, int idx1)
 {
 	t_vertex	*v0;
 	t_vertex	*v1;
@@ -58,16 +76,16 @@ static inline void	render_line(t_context *ctx, int i1, int i2)
 	t_vec2i		s;
 	bool		v0_visible;
 
-	v0 = vector_get(ctx->verts, i1);
-	v1 = vector_get(ctx->verts, i2);
+	v0 = vector_get(ctx->verts, idx0);
+	v1 = vector_get(ctx->verts, idx1);
 	if (vert_to_screen(v0, ctx) && vert_to_screen(v1, ctx))
 	{
-		ctx->color = v1->color;
-		s = v0->screen;
+		ctx->color = v0->color;
+		s = v0->s;
 		visible.x = s.x >= 0 && s.x < (int)ctx->img->width;
 		visible.y = s.y >= 0 && s.y < (int)ctx->img->height;
 		v0_visible = visible.x && visible.y;
-		s = v1->screen;
+		s = v1->s;
 		visible.x = s.x >= 0 && s.x < (int)ctx->img->width;
 		visible.y = s.y >= 0 && s.y < (int)ctx->img->height;
 		if (v0_visible || (visible.x && visible.y))
@@ -76,30 +94,30 @@ static inline void	render_line(t_context *ctx, int i1, int i2)
 }
 
 /**
- * Implements Bresenham's line algorithm with incremental error.
- * Also lerps the pixel color and depth from vertex data.
- * The final pixel color off by 1 step from v1 color.
+ * Implements Bresenham's line algorithm with incremental error tracking
+ * as best approximation to the ideal line.
+ * Interpolates both color and depth (z) along the line.
  *
- * @param d
- * @param s Slopes for x and y [-1 or 1]
- * @param error
- * @param steps Steps along the line. x is current, y is total steps.
- * @param t
+ * The final pixel color is not exact to v1 color.
+ *
+ * @param ctx Rendering context containing colors and altitude range.
+ * @param v0 Starting vertex (screen pos, color, depth)
+ * @param v1 Ending vertex (screen pos, color, depth)
+ * @param o Auxiliary vector for depth and altitude interpolation.
  */
 static inline void	drwline(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 o)
 {
 	t_vec2i	d;
 	t_vec2i	s;
-	t_vec2i	error;
+	int		error;
 	t_vec2	steps;
 	t_vec3	t;
 
-	d = vec2i(abs(v1.screen.x - v0.screen.x), -abs(v1.screen.y - v0.screen.y));
-	s.x = 1 + (-2 * (v0.screen.x >= v1.screen.x));
-	s.y = 1 + (-2 * (v0.screen.y >= v1.screen.y));
-	error.x = d.x + d.y;
-	steps = vec2(0.0f, fmaxf(d.x, -d.y));
-	while (v0.screen.x != v1.screen.x || v0.screen.y != v1.screen.y)
+	d = vec2i(abs(v1.s.x - v0.s.x), abs(v1.s.y - v0.s.y));
+	s = vec2i(1 + (-2 * (v0.s.x >= v1.s.x)), 1 + (-2 * (v0.s.y >= v1.s.y)));
+	error = d.x - d.y;
+	steps = vec2(0.0f, fmaxf(d.x, d.y));
+	while (v0.s.x != v1.s.x || v0.s.y != v1.s.y)
 	{
 		t.x = steps.x++ / steps.y;
 		ctx->color = lerp_color(v0.color, v1.color, t.x);
@@ -117,27 +135,46 @@ static inline void	drwline(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 o)
 }
 
 /**
- * Moves the position of the pixel along the line.
- * Determines if either x or y is incremented, based on the slope of the line
+ * Advances the current pixel position along the line.
+ * Uses the accumulated error term to determine a step in
+ * x, y, or both directions.
+ *
+ * @param d Absolute difference in x and y between endpoints.
+ * @param s Step direction for x and y (-1 or +1).
+ * @param error Accumulated error term, updated when stepping.
+ * @param v0 Current vertex, screen-space coordinates updated in-place.
  */
-static inline void	movepixel(t_vec2i *d, t_vec2i *s, t_vec2i *e, t_vertex *v0)
+static inline void	movepixel(t_vec2i *d, t_vec2i *s, int *error, t_vertex *v0)
 {
-	e->y = 2 * e->x;
-	if (e->y >= d->y)
+	t_vec2i	*delta;
+	t_vec2i	*steps;
+	t_vec2i	*screen;
+	int		e2;
+
+	delta = d;
+	steps = s;
+	screen = &(v0->s);
+	e2 = 2 * (*error);
+	if (e2 > -delta->y)
 	{
-		e->x += d->y;
-		v0->screen.x += s->x;
+		*error -= delta->y;
+		screen->x += steps->x;
 	}
-	if (e->y <= d->x)
+	if (e2 < delta->x)
 	{
-		e->x += d->x;
-		v0->screen.y += s->y;
+		*error += delta->x;
+		screen->y += steps->y;
 	}
 }
 
 /**
- * Implements Bresenham's line algorithm.
- * Also lerps the pixel color and depth from vertex data.
+ * Draws a pixel if it is within the render image boundaries and
+ * and passes the depth test against the Z-buffer. Updates Z-buffer when drawn.
+ *
+ * @param ctx Rendering context containing render image and Z-buffer.
+ * @param v0 Current vertex with interpolated screen-space coordinates (x, y).
+ * @param c Pixel color (32-bit RGBA).
+ * @param z Interpolated depth value for the pixel, used for depth testing.
  */
 static inline void	drawpixel(t_context *ctx, t_vertex v0, uint32_t c, float z)
 {
@@ -145,8 +182,8 @@ static inline void	drawpixel(t_context *ctx, t_vertex v0, uint32_t c, float z)
 	int	y;
 	int	index;
 
-	x = v0.screen.x;
-	y = v0.screen.y;
+	x = v0.s.x;
+	y = v0.s.y;
 	if (x >= 0 && x < (int)ctx->img->width && \
 y >= 0 && y < (int)ctx->img->height)
 	{
