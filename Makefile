@@ -6,7 +6,7 @@
 #    By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/30 16:50:13 by myli-pen          #+#    #+#              #
-#    Updated: 2025/07/22 18:05:46 by myli-pen         ###   ########.fr        #
+#    Updated: 2025/07/23 06:32:39 by myli-pen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -47,9 +47,6 @@ RED			=\033[1;31m
 COLOR		=\033[0m
 
 all: $(DIR_OBJ) $(LIBFT) $(MLX42) $(NAME)
-
-libftclean:
-	make -C $(DIR_LIBFT) re;
 
 $(DIR_OBJ):
 	@mkdir -p $(DIR_LIB) $(DIR_OBJ) $(DIR_DEP)

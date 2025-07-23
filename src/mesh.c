@@ -6,21 +6,21 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:14:56 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 03:51:07 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 14:03:07 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
 /**
- * Creates a memory allocated vertex from given position and color.
- * Initializes w, screen coordinates, and depth.
+ * Creates a dynamically allocated vertex from given position and color.
+ * Initializes its position, color, screen coordinates, and depth.
  *
  * @param x X position in object space.
- * @param y Y position in object space.
+ * @param y Y position in object space (negated).
  * @param z Z position in object space.
- * @param color Vertex color.
- * @return New vertex.
+ * @param color Vertex color (32-bit RGBA).
+ * @return Pointer to a new vertex.
  */
 t_vertex	*make_vert(float x, float y, float z, uint32_t color)
 {
@@ -37,11 +37,13 @@ t_vertex	*make_vert(float x, float y, float z, uint32_t color)
 }
 
 /**
- * Fills a vector with triangles that hold vertex indices.
+ * Divides a grid of vertices into triangles and stores the triangle vertex
+ * indices as `vec3` structures inside the given `tris` vector.
+ * Each quad formed by adjacent vertices is split into two triangles.
  *
- * @param tris Vector containing the triangles.
- * @param rows_cols A tuple containing number of vertex rows and columns.
- * @return True on success, false on error.
+ * @param tris Vector containing the generated triangles.
+ * @param rows_cols A tuple containing number of vertex rows(x) and columns(y).
+ * @return `true` on success, `false` if memory allocation fails.
  */
 bool	make_triangles(t_vector *tris, t_vec2i rows_cols)
 {
@@ -73,12 +75,12 @@ bool	make_triangles(t_vector *tris, t_vec2i rows_cols)
 }
 
 /**
- * Creates a memory allocated triangle from given indices.
+ * Creates a dynamically allocated triangle from given vertex indices.
  *
- * @param x Index for vertex 1.
- * @param y Index for vertex 2.
- * @param z Index for vertex 3.
- * @return New triangle.
+ * @param x Index of the first vertex.
+ * @param y Index of the second vertex
+ * @param z Index of the third vertex
+ * @return Pointer to a new triangle.
  */
 t_vec3	*make_tri(int x, int y, int z)
 {

@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:51 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 04:40:43 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 14:05:58 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,8 @@ void	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
 }
 
 /**
- * Computes the axis-aligned bounding box (AABB) of the model by
- * finding the minimum and maximum x, y, and z coordinates among all vertices.
+ * Computes the axis-aligned bounding box of the model by
+ * finding the minimum/maximum x, y, and z coordinates among all vertices.
  *
  * @param ctx Rendering context.
  * @param space Coordinate space in which bounds are computed (OBJECT or WORLD).

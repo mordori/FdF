@@ -6,18 +6,18 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:09:05 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 04:01:17 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 14:20:23 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
 /**
- * Clears the render image pixels with a solid color and the Z-buffer.
- * Sets the data for the first row, then copies it to the rest of rows.
+ * Clears the render image pixels with a solid color and the Z-buffer to INF.
+ * Sets the data for the first row, then copies it to the subsequent rows.
  *
  * @param ctx Model context containing render image and Z-buffer.
- * @param color Solid color.
+ * @param color Color (32-bit RGBA).
  */
 void	clear_image(t_context *ctx, uint32_t color)
 {
@@ -50,9 +50,10 @@ void	clear_image(t_context *ctx, uint32_t color)
  * then interpolates them, and finally combines everything back into a 32-bit
  * RGBA color.
  *
- * @param c1 Color 1 (32-bit RBGA).
- * @param c2 Color 2 (32-bit RBGA).
- * @param t Time, controls the interpolation.
+ * @param c1 Starting color (32-bit RBGA).
+ * @param c2 Target color (32-bit RBGA).
+ * @param t Interpolation factor.
+ * @return Interpolated color (32-bit RGBA).
  */
 uint32_t	lerp_color(uint32_t c1, uint32_t c2, float t)
 {
@@ -76,7 +77,7 @@ uint32_t	lerp_color(uint32_t c1, uint32_t c2, float t)
 }
 
 /**
- * UI function for controls information.
+ * Updates the main UI elements (projection mode and control hints).
  *
  * @param ctx Render context containing camera and mlx context.
  */
@@ -110,7 +111,7 @@ void	update_ui(t_context *ctx)
 }
 
 /**
- * Additional UI function for controls information.
+ * Updates additional UI control hints.
  *
  * @param ctx Render context containing camera and mlx context.
  */
@@ -129,10 +130,11 @@ void	update_ui_2(t_context *ctx)
 }
 
 /**
- * Creates a color (32-bit RGBA) with offset channels that are iterated by
- * a sine wave remapped to 0-1.
+ * Generates a time-based rainbow color. Uses offset sine waves to oscillate
+ * RGB channels between [0 - 255].
  *
- * @param t Time, controls the sine wave.
+ * @param t Time, animates the sine waves.
+ * @return New color (32-bit RGBA).
  */
 uint32_t	rainbow_rgb(double t)
 {

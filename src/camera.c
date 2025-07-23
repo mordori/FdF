@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 13:45:24 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 05:23:24 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 16:55:18 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static inline void	compute_distance(t_context *ctx);
  *
  * - Sets the camera's target to the model's center.
  *
- * - Computes an appropriate camera distance based on model bounds.
+ * - Computes camera distance based on model bounds.
  *
  * - Calls `update_camera()` to apply pitch, yaw, and distance.
  *
@@ -44,11 +44,11 @@ void	frame(t_context *ctx)
 /**
  * Updates the camera's eye based on its yaw, pitch, distance, and target.
  *
- * Constraints the pitch angle within (-π/2, π/2) to avoid gimbal lock.
+ * Constraints the pitch angle within [-π/2, π/2] to avoid gimbal lock.
  * The camera's `eye` position is calculated relative to `target`
  * using spherical coordinates defined by yaw, pitch, and distance.
  *
- * @param cam Pointer to the camera to update.
+ * @param cam Camera.
  */
 void	update_camera(t_cam *cam)
 {
@@ -93,16 +93,15 @@ void	init_camera(t_context *ctx)
  * Computes the appropriate camera distance or orthographic size
  * needed to fit the model within the view frustum.
  *
- * - A small padding factor (1.1x) is applied.
+ * Padding factor (1.1x) is applied.
  *
  * @param ctx Rendering context containing the camera and model bounds.
  */
 static inline void	compute_distance(t_context *ctx)
 {
-	float	max_dim;
-	float	padding;
+	const float	padding = 1.1f;
+	float		max_dim;
 
-	padding = 1.1f;
 	max_dim = fmaxf(fmaxf(ctx->bounds.x, ctx->bounds.y), ctx->bounds.z);
 	max_dim *= padding;
 	if (ctx->cam.projection == PERSPECTIVE)

@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:24:31 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 03:52:50 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 14:06:48 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 /**
  * Resize hook, sets the render image to new dimensions.
- * Frames the rendering with the new aspect.
+ * Frames the model with the new aspect.
  *
  * @param width New window width.
  * @param height New window height.
@@ -57,7 +57,7 @@ void	ft_error(mlx_t *mlx, char *message)
 }
 
 /**
- * Frees the rendering context and `verts` `tris` vector arrays.
+ * Frees the rendering context, Z-buffer, and the `verts` `tris` vector arrays.
  *
  * @param verts Vertices vector array.
  * @param tris Triangles vector array.

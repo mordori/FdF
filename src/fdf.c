@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 06:23:25 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 16:32:48 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@ static inline void	input(mlx_key_data_t keydata, void *param);
 /**
  * Simple wireframe model software renderer with limited file parsing.
  *
- * Main initializes mlx context, render imgage, sets the loop hooks,
- * and begins model initialization.
+ * Follows an OpenGL-style right-handed coordinate convention,
+ * where Y is up, X is to the right, and in view space the camera looks down -Z.
  *
  * Known flaws:
  *
@@ -28,13 +28,18 @@ static inline void	input(mlx_key_data_t keydata, void *param);
  *
  * - Lines on the last row and column of triangles are rendered twice.
  *
- * - The final pixel color on a line is not exact to v1 color.
+ * - The final pixel color on a line is not exact to the target vertex color.
+ *
+ * - Mouse does not wrap around window with active camera motion.
  *
  * - Inadequate performance with higher vertex amounts,
- * probably due to the use of too many instructions and dynamic vector arrays.
+ * likely due to the use of too many instructions and dynamic vector arrays.
  *
  * - Orthographic projections easily introduce an optical illusion where the
  * model seemingly flips at certain camera angles.
+ *
+ * Main initializes mlx context, render imgage, sets the loop hooks,
+ * and begins model initialization.
  *
  * @param argc Arguments count.
  * @param argv File path e.g. "maps/42.fdf"
@@ -102,19 +107,17 @@ static inline void	loop(void *param)
 /**
  * Loop hook for discrete input commands.
  *
- * Keys:
+ * - [ESC]		exit program.
  *
- * -ESC exit program.
+ * - [P]		switch projection.
  *
- * -P switch projection.
+ * - [C]		toggle color mode.
  *
- * -C toggle color mode.
+ * - [F]		frame the model.
  *
- * -F frame the model.
+ * - [SPACE]	toggle spin mode.
  *
- * -SPACE toggle spin mode.
- *
- * -R reset model transform and camera angle.
+ * - [R]		reset model transform and camera angle.
  *
  * @param keydata Mlx key data.
  * @param param Rendering context.

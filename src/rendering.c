@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:08:26 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 06:19:24 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 17:45:53 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ static inline void	render_line(t_context *ctx, int idx0, int idx1)
  * as best approximation to the ideal line.
  * Interpolates both color and depth (z) along the line.
  *
- * The final pixel color is not exact to v1 color.
+ * The final pixel color on a line is not exact to the target vertex color.
  *
  * @param ctx Rendering context containing colors and altitude range.
  * @param v0 Starting vertex (screen pos, color, depth)

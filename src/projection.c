@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:18:33 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 01:03:35 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 17:14:23 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,28 @@ static inline t_mat4	view_matrix(t_cam cam);
 static inline t_mat4	proj_persp(t_cam cam);
 static inline t_mat4	proj_ortho(t_cam cam);
 
+/**
+ * Transforms a vertex from object space to screen space.
+ *
+ * The following transformation chain is applied:
+ *
+ * - Model Space	->	World Space		(model_matrix)
+ *
+ * - World Space	->	View Space		(view_matrix)
+ *
+ * - View Space		->	Clip Space		(projection matrix)
+ *
+ * - Clip Space		->	NDC Space		(divide by w)
+ *
+ * - NDC Space		->	Screen Space	(viewport transform)
+ *
+ * The result is stored in the vertex's screen coordinates `vert->s`
+ * and depth `vert->z`.
+ *
+ * @param vert Vertex to transform.
+ * @param ctx Rendering context containing the camera and transformations.
+ * @return `true` if the vertex is in front of the camera, `false` otherwise.
+ */
 bool	vert_to_screen(t_vertex *vert, t_context *ctx)
 {
 	t_matrices	m;
@@ -24,10 +46,11 @@ bool	vert_to_screen(t_vertex *vert, t_context *ctx)
 
 	m.m = model_matrix(ctx);
 	m.v = view_matrix(ctx->cam);
-	m.p = proj_persp(ctx->cam);
-	if (ctx->cam.projection != PERSPECTIVE)
+	if (ctx->cam.projection == PERSPECTIVE)
+		m.p = proj_persp(ctx->cam);
+	else
 		m.p = proj_ortho(ctx->cam);
-	m.mvp = mat4_mul(m.p, mat4_mul(m.v, m.m));
+	m.mvp = mat4_mul(mat4_mul(m.p, m.v), m.m);
 	v_clip = mat4_mul_vec4(m.mvp, vert->pos);
 	if (v_clip.w <= 0.0f)
 		return (false);
@@ -38,6 +61,13 @@ bool	vert_to_screen(t_vertex *vert, t_context *ctx)
 	return (true);
 }
 
+/**
+ * Builds the model matrix for the current transformation by combining
+ * translation, rotation, and scaling into a single matrix.
+ *
+ * @param ctx Rendering context containing the model's transform.
+ * @return The resulting 4x4 model matrix.
+ */
 t_mat4	model_matrix(t_context *ctx)
 {
 	t_matrices	m;
@@ -45,10 +75,17 @@ t_mat4	model_matrix(t_context *ctx)
 	m.t = mat4_translate(ctx->transform.pos);
 	m.r = mat4_rot(ctx->transform.rot);
 	m.s = mat4_scale(ctx->transform.scale);
-	m.m = mat4_mul(m.t, mat4_mul(m.r, m.s));
+	m.m = mat4_mul(mat4_mul(m.t, m.r), m.s);
 	return (m.m);
 }
 
+/**
+ * Constructs the view matrix based on the camera's eye position,
+ * target, and up vector.
+ *
+ * @param cam Camera structure containing eye, target, and up vectors.
+ * @return The resulting 4x4 view matrix.
+ */
 static inline t_mat4	view_matrix(t_cam cam)
 {
 	t_vec3	forward;
@@ -75,6 +112,13 @@ static inline t_mat4	view_matrix(t_cam cam)
 	return (view);
 }
 
+/**
+ * Constructs a perspective projection matrix using a field of view,
+ * aspect ratio, and near/far planes.
+ *
+ * @param cam Camera structure containing fov, aspect, near and far values.
+ * @return The resulting 4x4 perspective projection matrix.
+ */
 static inline t_mat4	proj_persp(t_cam cam)
 {
 	float	f;
@@ -90,6 +134,23 @@ static inline t_mat4	proj_persp(t_cam cam)
 	return (proj);
 }
 
+/**
+ * Builds orthographic projection matrix based on the camera's ortho size,
+ * aspect ratio, and near/far planes.
+ *
+ * Sides:
+ *
+ * - Left		(x)
+ *
+ * - Right		(y)
+ *
+ * - Bottom		(z)
+ *
+ * - Top		(w)
+ *
+ * @param cam Camera structure containing ortho_size, aspect, near, and far.
+ * @return The resulting 4x4 orthographic projection matrix.
+ */
 static inline t_mat4	proj_ortho(t_cam cam)
 {
 	t_mat4	proj;

@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 22:37:25 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 05:22:56 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 13:42:23 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,9 @@
 #  define HEIGHT 1080
 # endif
 
-# define SENSITIVITY 0.005f
+# define ZOOM_SENS 0.0018f
+# define PAN_SENS 0.00048f
+# define ORBIT_SENS 0.0017f
 
 # include <stdlib.h>
 # include <stdio.h>
