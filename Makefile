@@ -6,7 +6,7 @@
 #    By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/30 16:50:13 by myli-pen          #+#    #+#              #
-#    Updated: 2025/07/23 06:32:39 by myli-pen         ###   ########.fr        #
+#    Updated: 2025/07/24 00:04:49 by myli-pen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,7 +36,8 @@ HEADERS		=$(addprefix -I , \
 				$(DIR_INC) $(DIR_LIBFT)$(DIR_INC) $(DIR_MLX)$(DIR_INC)MLX42/)
 SRCS		=$(addprefix $(DIR_SRC), \
 				fdf.c fdf_utils.c mesh.c parsing.c projection.c rendering.c \
-				rendering_utils.c camera.c model.c camera_controller.c)
+				rendering_utils.c camera.c model.c camera_controller.c \
+				camera_controller_2.c)
 OBJS		=$(patsubst $(DIR_SRC)%.c, $(DIR_OBJ)%.o, $(SRCS))
 DEPS		=$(patsubst $(DIR_SRC)%.c, $(DIR_DEP)%.d, $(SRCS))
 

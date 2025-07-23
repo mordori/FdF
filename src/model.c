@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:51 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 14:05:58 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 21:20:03 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
 		return (fdf_free(verts, tris, NULL), ft_error(mlx, "tris fill"));
 	*ctx = malloc(sizeof (t_context));
 	if (!*ctx)
-		return (fdf_free(verts, tris, *ctx), ft_error(mlx, "ctx alloc"));
+		return (fdf_free(verts, tris, NULL), ft_error(mlx, "ctx alloc"));
 	(*ctx)->verts = verts;
 	(*ctx)->tris = tris;
 	(*ctx)->rows_cols = rows_cols;
@@ -120,7 +120,7 @@ static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img)
 
 	ctx->z_buf = malloc(sizeof(float) * img->width * img->height);
 	if (!ctx->z_buf)
-		return (fdf_free(ctx->verts, ctx->tris, ctx), ft_error(mlx, "z alloc"));
+		return (fdf_free(ctx->verts, ctx->tris, ctx), ft_error(mlx, "z-buf"));
 	i = 0;
 	while (i < img->width * img->height)
 		ctx->z_buf[i++] = INFINITY;

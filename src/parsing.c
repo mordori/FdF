@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:04:16 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 14:53:34 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 21:10:03 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,8 +150,9 @@ static inline uint32_t	parse_color(const char *str)
 
 	ft_memset(padded, '0', 8);
 	padded[8] = '\0';
-	trimmed = (char *)str + 2;
-	trimmed = ft_strtrim(trimmed, "\n");
+	trimmed = ft_strtrim((char *)str + 2, "\n");
+	if (!trimmed)
+		return (ERROR_COLOR);
 	ft_striteri(trimmed, ft_toupper);
 	len = ft_strlen(trimmed);
 	if (len >= 2 && len <= 8)

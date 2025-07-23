@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:24:31 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 14:06:48 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/23 21:27:19 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,8 +72,6 @@ void	fdf_free(t_vector *verts, t_vector *tris, t_context *ctx)
 	free(verts);
 	free(tris);
 	if (ctx)
-	{
 		free(ctx->z_buf);
-		free(ctx);
-	}
+	free(ctx);
 }

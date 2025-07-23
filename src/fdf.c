@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 16:32:48 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 00:20:38 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,6 @@ static inline void	input(mlx_key_data_t keydata, void *param);
  * - Lines on the last row and column of triangles are rendered twice.
  *
  * - The final pixel color on a line is not exact to the target vertex color.
- *
- * - Mouse does not wrap around window with active camera motion.
  *
  * - Inadequate performance with higher vertex amounts,
  * likely due to the use of too many instructions and dynamic vector arrays.
@@ -57,7 +55,7 @@ int	main(int argc, char *argv[])
 	if (!mlx)
 		ft_error(NULL, "mlx alloc");
 	img = mlx_new_image(mlx, mlx->width, mlx->height);
-	if (!img || (mlx_image_to_window(mlx, img, 0, 0) < 0))
+	if (!img || mlx_image_to_window(mlx, img, 0, 0) == ERROR)
 		ft_error(mlx, "img alloc");
 	initialize(argv[1], &ctx, mlx, img);
 	mlx_loop_hook(mlx, loop, ctx);

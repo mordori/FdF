@@ -6,16 +6,16 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 19:29:14 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 17:48:14 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 01:06:05 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-static inline void	translate_rotate(t_context *ctx);
-static inline void	orbit(t_context *ctx);
+static inline void	orbit(t_context *ctx, t_vec2i pos, t_vec2i d);
 static inline void	pan(t_context *ctx, t_cam *cam, t_vec2i d, t_vec2i pos);
-static inline void	zoom(t_context *ctx);
+static inline void	zoom(t_context *ctx, t_vec2i pos);
+static inline void	translate_rotate(t_context *ctx);
 
 /**
  * Processes all camera-related input and updates the camera state.
@@ -35,21 +35,28 @@ static inline void	zoom(t_context *ctx);
  */
 void	control_camera(void *param)
 {
-	t_context	*ctx;
+	static t_vec2i	lgc_m;
+	t_context		*ctx;
+	t_vec2i			pos;
 
 	ctx = param;
 	if (ctx->cam.projection != ISOMETRIC)
 	{
+		mlx_get_mouse_pos(ctx->mlx, &pos.x, &pos.y);
+		if (ctx->cam.orbiting || ctx->cam.zooming)
+			lgc_m = vec2i(wrap_m_x(ctx, &pos), wrap_m_y(ctx, &pos));
 		if (ctx->spin == OFF)
 			translate_rotate(ctx);
 		if (!ctx->cam.zooming && !ctx->cam.panning)
-			orbit(ctx);
+			orbit(ctx, vec2i_add(pos, lgc_m), vec2i(0, 0));
 		if (!ctx->cam.orbiting && !ctx->cam.panning)
-			zoom(ctx);
+			zoom(ctx, vec2i_add(pos, lgc_m));
 		if (!ctx->cam.orbiting && !ctx->cam.zooming)
-			pan(ctx, &ctx->cam, vec2i(0, 0), vec2i(0, 0));
-		if (ctx->cam.orbiting || ctx->cam.zooming || ctx->cam.panning)
-			update_camera(&ctx->cam);
+			pan(ctx, &ctx->cam, vec2i(0, 0), pos);
+		if (!ctx->cam.orbiting && !ctx->cam.zooming && !ctx->cam.panning)
+			return (mlx_set_cursor_mode(ctx->mlx, MLX_MOUSE_NORMAL));
+		mlx_set_cursor_mode(ctx->mlx, MLX_MOUSE_HIDDEN);
+		update_camera(&ctx->cam);
 	}
 }
 
@@ -75,11 +82,10 @@ static inline void	translate_rotate(t_context *ctx)
 	if (mlx_is_key_down(ctx->mlx, MLX_KEY_DOWN))
 		ctx->transform.rot.x += ctx->mlx->delta_time;
 	if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT))
-		ctx->transform.rot.z -= ctx->mlx->delta_time;
-	if (mlx_is_key_down(ctx->mlx, MLX_KEY_RIGHT))
 		ctx->transform.rot.z += ctx->mlx->delta_time;
+	if (mlx_is_key_down(ctx->mlx, MLX_KEY_RIGHT))
+		ctx->transform.rot.z -= ctx->mlx->delta_time;
 }
-
 
 /**
  * Orbits the camera around the target `Left ALT + Left Mouse Button` is held.
@@ -90,31 +96,32 @@ static inline void	translate_rotate(t_context *ctx)
  *
  * @param ctx Rendering context containing camera and mlx context.
  */
-static inline void	orbit(t_context *ctx)
+static inline void	orbit(t_context *ctx, t_vec2i pos, t_vec2i d)
 {
 	static t_vec2i	prev;
-	t_vec2i			pos;
-	t_vec2i			d;
+	static t_vec2i	orig;
 	float			speed;
 
 	if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
 mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_LEFT))
 	{
-		mlx_get_mouse_pos(ctx->mlx, &pos.x, &pos.y);
-		if (prev.x >= 0 && prev.y >= 0)
+		if (ctx->cam.orbiting)
 		{
 			d = vec2i_sub(pos, prev);
 			speed = ctx->mlx->delta_time * 60.0f * ORBIT_SENS;
 			ctx->cam.yaw -= d.x * speed;
 			ctx->cam.pitch += d.y * speed;
 		}
+		else
+			mlx_get_mouse_pos(ctx->mlx, &orig.x, &orig.y);
 		prev = pos;
 		ctx->cam.orbiting = true;
 	}
 	else
 	{
+		if (ctx->cam.orbiting)
+			mlx_set_mouse_pos(ctx->mlx, (uint32_t)orig.x, (uint32_t)orig.y);
 		ctx->cam.orbiting = false;
-		prev = vec2i_n(-1);
 	}
 }
 
@@ -142,7 +149,6 @@ static inline void	pan(t_context *ctx, t_cam *cam, t_vec2i d, t_vec2i pos)
 	if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
 mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_MIDDLE))
 	{
-		mlx_get_mouse_pos(ctx->mlx, &pos.x, &pos.y);
 		if (prev.x >= 0 && prev.y >= 0)
 			d = vec2i_sub(pos, prev);
 		speed = cam->distance * ctx->mlx->delta_time * 60.0f * PAN_SENS;
@@ -155,9 +161,10 @@ mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_MIDDLE))
 		cam->panning = true;
 	}
 	else
+	{
 		cam->panning = false;
-	if (!cam->panning)
 		prev = vec2i_n(-1);
+	}
 }
 
 /**
@@ -169,20 +176,23 @@ mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_MIDDLE))
  * Frame-rate independent.
  *
  * @param ctx Rendering context containing camera and mlx context.
+ * @param pos
  */
-static inline void	zoom(t_context *ctx)
+static inline void	zoom(t_context *ctx, t_vec2i pos)
 {
 	static t_vec2i	prev;
-	t_vec2i			pos;
+	static t_vec2i	orig;
 	float			speed;
 	float			delta;
 
 	if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
 mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_RIGHT))
 	{
-		mlx_get_mouse_pos(ctx->mlx, &pos.x, &pos.y);
-		if (prev.y == -1)
+		if (!ctx->cam.zooming)
+		{
+			mlx_get_mouse_pos(ctx->mlx, &orig.x, &orig.y);
 			prev.y = pos.y;
+		}
 		speed = ctx->cam.distance * ctx->mlx->delta_time * 60.0f * ZOOM_SENS;
 		delta = pos.y - prev.y;
 		ctx->cam.distance = fmaxf(0.1f, ctx->cam.distance - delta * speed);
@@ -192,7 +202,8 @@ mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_RIGHT))
 	}
 	else
 	{
-		prev.y = -1;
+		if (ctx->cam.zooming)
+			mlx_set_mouse_pos(ctx->mlx, (uint32_t)orig.x, (uint32_t)orig.y);
 		ctx->cam.zooming = false;
 	}
 }
