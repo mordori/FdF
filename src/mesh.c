@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:14:56 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 20:05:26 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 22:15:38 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,14 +62,14 @@ bool	make_triangles(t_vector *tris, t_vec2i rows_cols)
 		q.topright = q.topleft + 1;
 		q.bottomleft = q.topleft + rows_cols.y;
 		q.bottomright = q.bottomleft + 1;
-		if (i % 2 == 0)
+		if (i++ % 2 == 0)
 			tri = make_tri(q.topright, q.topleft, q.bottomleft);
 		else
 			tri = make_tri(q.bottomleft, q.bottomright, q.topright);
 		if (!tri)
 			return (false);
-		vector_add(tris, tri);
-		++i;
+		if (!vector_add(tris, tri))
+			return (false);
 	}
 	return (true);
 }

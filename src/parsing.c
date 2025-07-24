@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:04:16 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 21:10:03 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 22:12:41 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static inline int			parse_data(char **elem, t_vector *verts, int row);
 static inline int			init_line(char *line, char ***elements);
-static inline uint32_t	parse_color(const char *str);
+static inline uint32_t	parse_color(char *str);
 static inline void		free_parse(char *line, char **elements);
 
 /**
@@ -41,18 +41,18 @@ int	parse_map(char *map, t_vector *verts, t_vec2i *rows_cols)
 
 	fd = open(map, O_RDONLY);
 	if (fd == ERROR)
-		return (ERROR);
+		return (close(fd), ERROR);
 	line = get_next_line(fd);
 	if (!line)
-		return (ERROR);
+		return (close(fd), ERROR);
 	rows_cols->x = 0;
 	while (line)
 	{
 		if (init_line(line, &elements) == ERROR)
-			return (free_parse(line, elements), ERROR);
+			return (close(fd), free_parse(line, elements), ERROR);
 		col = parse_data(elements, verts, rows_cols->x);
 		if (col == ERROR || (rows_cols->x && col != rows_cols->y))
-			return (free_parse(line, elements), ERROR);
+			return (close(fd), free_parse(line, elements), ERROR);
 		rows_cols->x++;
 		rows_cols->y = col;
 		free_parse(line, elements);
@@ -76,10 +76,17 @@ static inline int	init_line(char *line, char ***elements)
 	size_t	len;
 
 	len = ft_strlen(line);
+	if (len < 1)
+		return (ERROR);
 	if (line[len - 1] == '\n')
 		line[len - 1] = '\0';
 	*elements = ft_split(line, ' ');
 	if (!*elements)
+		return (ERROR);
+	len = 0;
+	while ((*elements)[len])
+		++len;
+	if (len < 2)
 		return (ERROR);
 	return (true);
 }
@@ -129,7 +136,8 @@ static inline int	parse_data(char **elem, t_vector *verts, int row)
 		vert = make_vert(col++, row, ft_atoi(data[0]), color);
 		if (!vert)
 			return (ft_free_split(data), ERROR);
-		vector_add(verts, vert);
+		if (!vector_add(verts, vert))
+			return (ft_free_split(data), ERROR);
 		ft_free_split(data);
 	}
 	return (col);
@@ -141,7 +149,7 @@ static inline int	parse_data(char **elem, t_vector *verts, int row)
  * @param str The color string in case-insensitive hex format.
  * @return 32-bit RGBA color, or ERROR_COLOR on failure.
  */
-static inline uint32_t	parse_color(const char *str)
+static inline uint32_t	parse_color(char *str)
 {
 	uint32_t	color;
 	char		*trimmed;
@@ -150,17 +158,18 @@ static inline uint32_t	parse_color(const char *str)
 
 	ft_memset(padded, '0', 8);
 	padded[8] = '\0';
-	trimmed = ft_strtrim((char *)str + 2, "\n");
-	if (!trimmed)
-		return (ERROR_COLOR);
+	trimmed = ft_strchr(str + 2, '\n');
+	if (trimmed)
+		*trimmed = '\0';
+	trimmed = str + 2;
 	ft_striteri(trimmed, ft_toupper);
 	len = ft_strlen(trimmed);
 	if (len >= 2 && len <= 8)
 		ft_memcpy(padded, trimmed, len);
 	else
-		return (free(trimmed), ERROR_COLOR);
+		return (ERROR_COLOR);
 	color = ft_atouint32_t_base(padded, BASE_16);
 	if ((color & 0xFF) == 0)
 		color |= 0xFF;
-	return (free(trimmed), color);
+	return (color);
 }

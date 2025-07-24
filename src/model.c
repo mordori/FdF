@@ -6,12 +6,11 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:51 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 16:20:23 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 22:22:27 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
-#include "fdf_2.h"
 
 static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img);
 static inline void	normalize_model(t_context *ctx);
@@ -34,15 +33,15 @@ void	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
 	t_vec2i		rows_cols;
 
 	verts = malloc(sizeof (t_vector));
+	if (!verts)
+		return (ft_error(mlx, "verts alloc"));
 	tris = malloc(sizeof (t_vector));
-	verts->items = NULL;
-	tris->items = NULL;
-	if (!verts || !tris)
-		return (fdf_free(verts, tris, NULL), ft_error(mlx, "verts/tris alloc"));
+	if (!tris)
+		return (free(verts), ft_error(mlx, "tris alloc"));
 	if (!vector_init(verts, true))
-		return (fdf_free(verts, tris, NULL), ft_error(mlx, "verts init"));
-	if (parse_map(file, verts, &rows_cols) == ERROR)
-		return (fdf_free(verts, tris, NULL), ft_error(mlx, "map parse"));
+		return (free(verts), free(tris), ft_error(mlx, "verts init"));
+	if (parse_map(file, verts, &rows_cols) == ERROR || rows_cols.x < 2)
+		return (fdf_free(verts, NULL, NULL), free(tris), ft_error(mlx, "map"));
 	if (!vector_init(tris, true))
 		return (fdf_free(verts, tris, NULL), ft_error(mlx, "tris init"));
 	if (!make_triangles(tris, rows_cols))

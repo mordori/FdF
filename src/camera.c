@@ -6,12 +6,11 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 13:45:24 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 17:06:44 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 22:40:17 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
-#include "fdf_2.h"
 
 static inline void	compute_distance(t_context *ctx);
 
@@ -100,7 +99,7 @@ void	init_camera(t_context *ctx)
  */
 static inline void	compute_distance(t_context *ctx)
 {
-	const float	padding = 1.1f;
+	const float	padding = 1.5f;
 	float		max_dim;
 
 	max_dim = fmaxf(fmaxf(ctx->bounds.x, ctx->bounds.y), ctx->bounds.z);

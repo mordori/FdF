@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:24:31 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 17:06:51 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 22:18:29 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,11 @@ void	resize(int width, int height, void *param)
  */
 void	ft_error(mlx_t *mlx, char *message)
 {
-	ft_putstr_fd("Error: ", STDERR_FILENO);
+	ft_putstr_fd("FdF:\tError: ", STDERR_FILENO);
 	ft_putendl_fd(message, STDERR_FILENO);
 	if (mlx)
 	{
-		ft_putstr_fd("MLX42: ", STDERR_FILENO);
+		ft_putstr_fd("MLX42:\t", STDERR_FILENO);
 		perror(mlx_strerror(mlx_errno));
 		mlx_terminate(mlx);
 	}
@@ -58,6 +58,7 @@ void	ft_error(mlx_t *mlx, char *message)
 
 /**
  * Frees the rendering context, Z-buffer, and the `verts` `tris` vector arrays.
+ * Should not be called with a vector that has not called vector_init()!
  *
  * @param verts Vertices vector array.
  * @param tris Triangles vector array.
@@ -65,9 +66,9 @@ void	ft_error(mlx_t *mlx, char *message)
  */
 void	fdf_free(t_vector *verts, t_vector *tris, t_context *ctx)
 {
-	if (verts && verts->items)
+	if (verts)
 		vector_free(verts);
-	if (tris && tris->items)
+	if (tris)
 		vector_free(tris);
 	free(verts);
 	free(tris);

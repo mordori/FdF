@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 22:37:25 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 15:49:08 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 19:10:06 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,5 +147,9 @@ int			wrap_m_x(t_context *ctx, t_vec2i *pos);
 int			wrap_m_y(t_context *ctx, t_vec2i *pos);
 void		key_hook(mlx_key_data_t keydata, void *param);
 void		translate_rotate(t_context *ctx);
+void		compute_bounds(t_context *ctx, t_space space,
+				size_t i, t_vertex *v);
+void		initialize(char *file, t_context **ctx,
+				mlx_t *mlx, mlx_image_t *img);
 
 #endif

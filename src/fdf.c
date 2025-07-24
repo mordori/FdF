@@ -6,12 +6,11 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 15:47:07 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 19:11:31 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
-#include "fdf_2.h"
 
 static inline void	loop(void *param);
 
