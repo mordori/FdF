@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:24:31 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 21:27:19 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 17:06:51 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	resize(int width, int height, void *param)
 		return ;
 	free(ctx->z_buf);
 	ctx->z_buf = malloc(sizeof (float) * width * height);
-	if (!ctx->img || !ctx->z_buf || !mlx_resize_image(ctx->img, width, height))
+	if (!ctx->z_buf || !mlx_resize_image(ctx->img, width, height))
 	{
 		fdf_free(ctx->verts, ctx->tris, ctx);
 		ft_error(ctx->mlx, "resizing img failed");

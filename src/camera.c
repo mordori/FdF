@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 13:45:24 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 13:25:02 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 17:06:44 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	frame(t_context *ctx)
 {
 	t_vertex	v;
 
-	ctx->cam.aspect = (float)ctx->mlx->width / ctx->mlx->height;
+	ctx->cam.aspect = (float)ctx->img->width / ctx->img->height;
 	ctx->m.m = model_matrix(ctx);
 	compute_bounds(ctx, WORLD, 0, &v);
 	ctx->cam.target = ctx->center;
@@ -75,7 +75,7 @@ void	update_camera(t_cam *cam)
 void	init_camera(t_context *ctx)
 {
 	ctx->cam.projection = ISOMETRIC;
-	ctx->cam.aspect = (float)ctx->mlx->width / ctx->mlx->height;
+	ctx->cam.aspect = (float)ctx->img->width / ctx->img->height;
 	ctx->cam.target = vec3_n(0.0f);
 	ctx->cam.up = vec3(0.0f, 1.0f, 0.0f);
 	ctx->cam.yaw = M_PI / 4.0f;
@@ -104,6 +104,8 @@ static inline void	compute_distance(t_context *ctx)
 	float		max_dim;
 
 	max_dim = fmaxf(fmaxf(ctx->bounds.x, ctx->bounds.y), ctx->bounds.z);
+	if (ctx->img->width < ctx->img->height)
+		max_dim /= ctx->cam.aspect;
 	max_dim *= padding;
 	if (ctx->cam.projection == PERSPECTIVE)
 		ctx->cam.distance = (max_dim * 0.5f) / tanf(ctx->cam.fov * 0.5f);
