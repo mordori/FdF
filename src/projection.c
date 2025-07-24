@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:18:33 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 17:14:23 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 02:06:16 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ static inline t_mat4	view_matrix(t_cam cam)
 
 	forward = vec3_normalize(vec3_sub(cam.target, cam.eye));
 	right = vec3_normalize(vec3_cross(forward, cam.up));
-	up = vec3_cross(right, forward);
+	up = vec3_normalize(vec3_cross(right, forward));
 	view = mat4_identity();
 	view.m[0][0] = right.x;
 	view.m[0][1] = right.y;

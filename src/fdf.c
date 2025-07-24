@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 00:20:38 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 12:34:32 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #include "fdf_2.h"
 
 static inline void	loop(void *param);
-static inline void	input(mlx_key_data_t keydata, void *param);
 
 /**
  * Simple wireframe model software renderer with limited file parsing.
@@ -30,8 +29,10 @@ static inline void	input(mlx_key_data_t keydata, void *param);
  *
  * - The final pixel color on a line is not exact to the target vertex color.
  *
- * - Inadequate performance with higher vertex amounts,
- * likely due to the use of too many instructions and dynamic vector arrays.
+ * - Inadequate performance with higher vertex amounts, there is much
+ * optimization that could be done.
+ *
+ * - Panning needs to be more accurate.
  *
  * - Orthographic projections easily introduce an optical illusion where the
  * model seemingly flips at certain camera angles.
@@ -59,7 +60,7 @@ int	main(int argc, char *argv[])
 		ft_error(mlx, "img alloc");
 	initialize(argv[1], &ctx, mlx, img);
 	mlx_loop_hook(mlx, loop, ctx);
-	mlx_key_hook(mlx, input, ctx);
+	mlx_key_hook(mlx, key_hook, ctx);
 	mlx_resize_hook(mlx, resize, ctx);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
@@ -100,48 +101,4 @@ static inline void	loop(void *param)
 	render(ctx);
 	update_ui(ctx);
 	update_ui_2(ctx);
-}
-
-/**
- * Loop hook for discrete input commands.
- *
- * - [ESC]		exit program.
- *
- * - [P]		switch projection.
- *
- * - [C]		toggle color mode.
- *
- * - [F]		frame the model.
- *
- * - [SPACE]	toggle spin mode.
- *
- * - [R]		reset model transform and camera angle.
- *
- * @param keydata Mlx key data.
- * @param param Rendering context.
- */
-static inline void	input(mlx_key_data_t keydata, void *param)
-{
-	t_context	*ctx;
-
-	ctx = param;
-	if (keydata.key == MLX_KEY_ESCAPE && keydata.action == MLX_RELEASE)
-		mlx_close_window(ctx->mlx);
-	if (keydata.key == MLX_KEY_P && keydata.action == MLX_RELEASE)
-	{
-		ctx->cam.projection = (ctx->cam.projection + 1) % 3;
-		if (ctx->cam.projection == ISOMETRIC)
-			reset_transforms(ctx);
-	}
-	if (keydata.key == MLX_KEY_C && keydata.action == MLX_RELEASE)
-		ctx->colors = !ctx->colors;
-	if (ctx->cam.projection != ISOMETRIC)
-	{
-		if (keydata.key == MLX_KEY_F && keydata.action == MLX_RELEASE)
-			frame(ctx);
-		if (keydata.key == MLX_KEY_SPACE && keydata.action == MLX_RELEASE)
-			ctx->spin = !ctx->spin;
-		if (keydata.key == MLX_KEY_R && keydata.action == MLX_RELEASE)
-			reset_transforms(ctx);
-	}
 }

@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:08:26 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 17:45:53 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 12:26:58 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	render(void *param)
 /**
  * Does not implement proper clipping yet.
  *
- * Line is rejected if both vertices are outside of the frustrum,
+ * Line is rejected if both vertices are outside of the viewport,
  * or either is behind the camera.
  *
  * Pixels on a line outside the screen are not drawn, but they are computed.
