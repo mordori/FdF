@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 22:37:25 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 02:48:12 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 13:03:48 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,7 @@ typedef struct s_context
 	uint32_t	color1;
 	uint32_t	color2;
 	double		time_rot;
+	t_matrices	m;
 }				t_context;
 
 int			parse_map(char *map, t_vector *verts, t_vec2i *rows_cols);
@@ -136,6 +137,9 @@ void		reset_transforms(t_context *ctx);
 void		control_camera(void *param);
 t_vec3		*make_tri(int x, int y, int z);
 t_mat4		model_matrix(t_context *ctx);
+t_mat4		view_matrix(t_cam cam);
+t_mat4		proj_persp(t_cam cam);
+t_mat4		proj_ortho(t_cam cam);
 uint32_t	rainbow_rgb(double t);
 uint32_t	lerp_color(uint32_t c1, uint32_t c2, float t);
 t_vertex	*make_vert(float x, float y, float z, uint32_t color);

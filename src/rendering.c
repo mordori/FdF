@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:08:26 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 12:26:58 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 13:48:31 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,19 +40,23 @@ void	render(void *param)
 
 	ctx = param;
 	clear_image(ctx, 0xFF000000);
+	ctx->m.m = model_matrix(ctx);
+	ctx->m.v = view_matrix(ctx->cam);
+	ctx->m.p = proj_ortho(ctx->cam);
+	if (ctx->cam.projection == PERSPECTIVE)
+		ctx->m.p = proj_persp(ctx->cam);
+	ctx->m.mvp = mat4_mul(mat4_mul(ctx->m.p, ctx->m.v), ctx->m.m);
 	v_rc = vec2i(ctx->rows_cols.x - 1, ctx->rows_cols.y - 1);
-	i = 0;
-	while (i < ctx->tris->total)
+	i = -1;
+	while (++i < ctx->tris->total)
 	{
-		if (i % 2 == 0 || \
-(i / (2 * v_rc.y) == (size_t)v_rc.x - 1 && i % 2) || \
+		if (i % 2 == 0 || (i / (2 * v_rc.y) == (size_t)v_rc.x - 1 && i % 2) || \
 ((i / 2) % v_rc.y == (size_t)v_rc.y - 1 && i % 2))
 		{
 			index = vector_get(ctx->tris, i);
 			render_line(ctx, index->x, index->y);
 			render_line(ctx, index->y, index->z);
 		}
-		++i;
 	}
 }
 
@@ -98,8 +102,6 @@ static inline void	render_line(t_context *ctx, int idx0, int idx1)
  * as best approximation to the ideal line.
  * Interpolates both color and depth (z) along the line.
  *
- * The final pixel color on a line is not exact to the target vertex color.
- *
  * @param ctx Rendering context containing colors and altitude range.
  * @param v0 Starting vertex (screen pos, color, depth)
  * @param v1 Ending vertex (screen pos, color, depth)
@@ -110,16 +112,16 @@ static inline void	drwline(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 o)
 	t_vec2i	d;
 	t_vec2i	s;
 	int		error;
-	t_vec2	steps;
+	t_vec2i	steps;
 	t_vec3	t;
 
 	d = vec2i(abs(v1.s.x - v0.s.x), abs(v1.s.y - v0.s.y));
 	s = vec2i(1 + (-2 * (v0.s.x >= v1.s.x)), 1 + (-2 * (v0.s.y >= v1.s.y)));
 	error = d.x - d.y;
-	steps = vec2(0.0f, fmaxf(d.x, d.y));
-	while (v0.s.x != v1.s.x || v0.s.y != v1.s.y)
+	steps = vec2i(0.0f, ft_imax(d.x, d.y));
+	while (steps.x <= steps.y)
 	{
-		t.x = steps.x++ / steps.y;
+		t.x = (float)steps.x++ / steps.y;
 		ctx->color = lerp_color(v0.color, v1.color, t.x);
 		o.z = ft_lerp(v0.z, v1.z, t.x);
 		if (ctx->colors == AMAZING)
@@ -131,7 +133,6 @@ static inline void	drwline(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 o)
 		drawpixel(ctx, v0, ctx->color, o.z);
 		movepixel(&d, &s, &error, &v0);
 	}
-	drawpixel(ctx, v0, ctx->color, o.z);
 }
 
 /**

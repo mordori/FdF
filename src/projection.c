@@ -6,15 +6,11 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:18:33 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 02:06:16 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 13:50:16 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
-
-static inline t_mat4	view_matrix(t_cam cam);
-static inline t_mat4	proj_persp(t_cam cam);
-static inline t_mat4	proj_ortho(t_cam cam);
 
 /**
  * Transforms a vertex from object space to screen space.
@@ -40,18 +36,12 @@ static inline t_mat4	proj_ortho(t_cam cam);
  */
 bool	vert_to_screen(t_vertex *vert, t_context *ctx)
 {
-	t_matrices	m;
-	t_vec4		v_clip;
-	t_vec3		v_ndc;
+	t_mat4	mvp;
+	t_vec4	v_clip;
+	t_vec3	v_ndc;
 
-	m.m = model_matrix(ctx);
-	m.v = view_matrix(ctx->cam);
-	if (ctx->cam.projection == PERSPECTIVE)
-		m.p = proj_persp(ctx->cam);
-	else
-		m.p = proj_ortho(ctx->cam);
-	m.mvp = mat4_mul(mat4_mul(m.p, m.v), m.m);
-	v_clip = mat4_mul_vec4(m.mvp, vert->pos);
+	mvp = ctx->m.mvp;
+	v_clip = mat4_mul_vec4(mvp, vert->pos);
 	if (v_clip.w <= 0.0f)
 		return (false);
 	v_ndc = vec3_scale(vec3_4(v_clip), 1.0f / v_clip.w);
@@ -86,7 +76,7 @@ t_mat4	model_matrix(t_context *ctx)
  * @param cam Camera structure containing eye, target, and up vectors.
  * @return The resulting 4x4 view matrix.
  */
-static inline t_mat4	view_matrix(t_cam cam)
+t_mat4	view_matrix(t_cam cam)
 {
 	t_vec3	forward;
 	t_vec3	right;
@@ -95,7 +85,7 @@ static inline t_mat4	view_matrix(t_cam cam)
 
 	forward = vec3_normalize(vec3_sub(cam.target, cam.eye));
 	right = vec3_normalize(vec3_cross(forward, cam.up));
-	up = vec3_normalize(vec3_cross(right, forward));
+	up = vec3_cross(right, forward);
 	view = mat4_identity();
 	view.m[0][0] = right.x;
 	view.m[0][1] = right.y;
@@ -119,7 +109,7 @@ static inline t_mat4	view_matrix(t_cam cam)
  * @param cam Camera structure containing fov, aspect, near and far values.
  * @return The resulting 4x4 perspective projection matrix.
  */
-static inline t_mat4	proj_persp(t_cam cam)
+t_mat4	proj_persp(t_cam cam)
 {
 	float	f;
 	t_mat4	proj;
@@ -151,7 +141,7 @@ static inline t_mat4	proj_persp(t_cam cam)
  * @param cam Camera structure containing ortho_size, aspect, near, and far.
  * @return The resulting 4x4 orthographic projection matrix.
  */
-static inline t_mat4	proj_ortho(t_cam cam)
+t_mat4	proj_ortho(t_cam cam)
 {
 	t_mat4	proj;
 	t_vec4	sides;

@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 13:45:24 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 16:55:18 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 13:25:02 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ void	frame(t_context *ctx)
 	t_vertex	v;
 
 	ctx->cam.aspect = (float)ctx->mlx->width / ctx->mlx->height;
+	ctx->m.m = model_matrix(ctx);
 	compute_bounds(ctx, WORLD, 0, &v);
 	ctx->cam.target = ctx->center;
 	compute_distance(ctx);

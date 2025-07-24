@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 12:34:32 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 13:45:06 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,10 @@ static inline void	loop(void *param);
  *
  * - Lines on the last row and column of triangles are rendered twice.
  *
- * - The final pixel color on a line is not exact to the target vertex color.
- *
  * - Inadequate performance with higher vertex amounts, there is much
  * optimization that could be done.
  *
- * - Panning needs to be more accurate.
+ * - Panning could to be more accurate.
  *
  * - Orthographic projections easily introduce an optical illusion where the
  * model seemingly flips at certain camera angles.

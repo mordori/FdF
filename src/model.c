@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:51 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 21:20:03 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/24 13:26:40 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,9 +67,9 @@ void	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
  */
 void	compute_bounds(t_context *ctx, t_space space, size_t i, t_vertex *v)
 {
-	t_vec4		pos;
-	t_vec3		min;
-	t_vec3		max;
+	t_vec4	pos;
+	t_vec3	min;
+	t_vec3	max;
 
 	min = vec3(FLT_MAX, FLT_MAX, FLT_MAX);
 	max = vec3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
@@ -78,7 +78,7 @@ void	compute_bounds(t_context *ctx, t_space space, size_t i, t_vertex *v)
 		v = vector_get(ctx->verts, i++);
 		pos = v->pos;
 		if (space == WORLD)
-			pos = mat4_mul_vec4(model_matrix(ctx), v->pos);
+			pos = mat4_mul_vec4(ctx->m.m, v->pos);
 		min.x = fminf(min.x, pos.x);
 		min.y = fminf(min.y, pos.y);
 		min.z = fminf(min.z, pos.z);
@@ -115,13 +115,12 @@ void	compute_bounds(t_context *ctx, t_space space, size_t i, t_vertex *v)
  */
 static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img)
 {
-	size_t		i;
-	t_vertex	v;
+	static size_t	i;
+	t_vertex		v;
 
 	ctx->z_buf = malloc(sizeof(float) * img->width * img->height);
 	if (!ctx->z_buf)
 		return (fdf_free(ctx->verts, ctx->tris, ctx), ft_error(mlx, "z-buf"));
-	i = 0;
 	while (i < img->width * img->height)
 		ctx->z_buf[i++] = INFINITY;
 	ctx->mlx = mlx;
@@ -138,6 +137,7 @@ static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img)
 	if (ctx->alt_min_max.x == ctx->alt_min_max.y)
 		ctx->alt_min_max.y = ctx->alt_min_max.x + 1;
 	normalize_model(ctx);
+	ctx->m.m = model_matrix(ctx);
 	compute_bounds(ctx, WORLD, 0, &v);
 	init_camera(ctx);
 }
