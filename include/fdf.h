@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 22:37:25 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 15:25:26 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 19:48:06 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,12 +126,11 @@ void		ft_error(mlx_t *mlx, char *message);
 bool		make_triangles(t_vector *tris, t_vec2i rows_cols);
 void		clear_image(t_context *ctx, uint32_t color);
 void		render(void *param);
-void		fdf_free(t_vector *verts, t_vector *tris, t_context *ctx);
-bool		project_to_screen(t_vertex *vert, t_context *ctx, t_vec4 v_clip);
+void		fdf_free(t_vector *verts, t_vector *tris, t_context *ctx, char *msg);
+bool		project_to_screen(t_vertex *vert, t_context *ctx);
 void		update_camera(t_cam *cam);
 void		init_camera(t_context *ctx);
 void		update_ui(t_context *ctx);
-void		update_ui_2(t_context *ctx);
 void		frame(t_context *ctx);
 void		reset_transforms(t_context *ctx);
 void		control_camera(void *param);
@@ -152,7 +151,8 @@ void		compute_bounds(t_context *ctx, t_space space,
 void		initialize(char *file, t_context **ctx,
 				mlx_t *mlx, mlx_image_t *img);
 uint32_t	rgba_to_abgr(uint32_t rgba);
-bool 		liang_barsky(t_vec4 *v0, t_vec4 *v1);
-bool		z_test(t_context *ctx, t_vertex v0, t_vertex v1, t_vec4 t);
+bool 		liang_barsky_clip(t_vertex *v0, t_vertex *v1);
+bool 		liang_barsky_screen(t_context *ctx, t_vec4 *v);
+bool		depth_test(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 t);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:08:26 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 15:07:35 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 19:51:28 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 static inline void	render_line(
 						t_context *ctx, int idx0, int idx1);
 static inline void	draw_line(
-						t_context *ctx, t_vertex v0, t_vertex v1, float y0);
+						t_context *ctx, t_vertex v0, t_vertex v1);
 static inline void	move_pixel(
 						t_vec2i *d, t_vec2i *s, int *error, t_vertex *v0);
 static inline void	draw_pixel(
@@ -76,21 +76,27 @@ void	render(void *param)
  */
 static inline void	render_line(t_context *ctx, int idx0, int idx1)
 {
-	t_vertex	*v0;
-	t_vertex	*v1;
-	t_vec4		v_clip_0;
-	t_vec4		v_clip_1;
+	t_vertex	v0;
+	t_vertex	v1;
+	t_vec4		s_clip;
 
-	v0 = vector_get(ctx->verts, idx0);
-	v1 = vector_get(ctx->verts, idx1);
-	v_clip_0 = mat4_mul_vec4(ctx->m.mvp, v0->pos);
-	v_clip_1 = mat4_mul_vec4(ctx->m.mvp, v1->pos);
-	if (!liang_barsky(&v_clip_0, &v_clip_1))
+	v0 = *(t_vertex *)vector_get(ctx->verts, idx0);
+	v1 = *(t_vertex *)vector_get(ctx->verts, idx1);
+	v0.o_pos = v0.pos;
+	v1.o_pos =  v1.pos;
+	v0.pos = mat4_mul_vec4(ctx->m.mvp, v0.pos);
+	v1.pos = mat4_mul_vec4(ctx->m.mvp, v1.pos);
+	if (!liang_barsky_clip(&v0, &v1))
 		return ;
-	project_to_screen(v0, ctx, v_clip_0);
-	project_to_screen(v1, ctx, v_clip_1);
-	ctx->color = v0->color;
-	draw_line(ctx, *v0, *v1, v0->pos.y);
+	project_to_screen(&v0, ctx);
+	project_to_screen(&v1, ctx);
+	s_clip = vec4(v0.s.x, v0.s.y, v1.s.x, v1.s.y);
+	if (!liang_barsky_screen(ctx, &s_clip))
+		return ;
+	v0.s = vec2i_f(s_clip.x, s_clip.y);
+	v1.s = vec2i_f(s_clip.z, s_clip.w);
+	ctx->color = v0.color;
+	draw_line(ctx, v0, v1);
 }
 
 /**
@@ -104,7 +110,7 @@ static inline void	render_line(t_context *ctx, int idx0, int idx1)
  * @param o Auxiliary vector for depth and altitude interpolation.
  */
 static inline void	draw_line(
-						t_context *ctx, t_vertex v0, t_vertex v1, float y0)
+						t_context *ctx, t_vertex v0, t_vertex v1)
 {
 	t_vec2i	d;
 	t_vec2i	s;
@@ -119,7 +125,7 @@ static inline void	draw_line(
 	while (steps.x <= steps.y)
 	{
 		t.x = (float)steps.x++ / steps.y;
-		if (z_test(ctx, v0, v1, vec4_3(t, y0)))
+		if (depth_test(ctx, v0, v1, t))
 			draw_pixel(ctx, v0, ctx->color);
 		move_pixel(&d, &s, &error, &v0);
 	}

@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/23 23:56:47 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 03:54:59 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 16:23:44 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,10 +106,11 @@ void	key_hook(mlx_key_data_t keydata, void *param)
 	{
 		ctx->cam.projection = (ctx->cam.projection + 1) % 3;
 		if (ctx->cam.projection == ISOMETRIC)
+		{
+			ctx->color_mode = DEFAULT;
 			reset_transforms(ctx);
+		}
 	}
-	if (keydata.key == MLX_KEY_C && keydata.action == MLX_RELEASE)
-		ctx->color_mode = !ctx->color_mode;
 	if (ctx->cam.projection != ISOMETRIC)
 	{
 		if (keydata.key == MLX_KEY_F && keydata.action == MLX_RELEASE)
@@ -118,5 +119,7 @@ void	key_hook(mlx_key_data_t keydata, void *param)
 			ctx->spin_mode = !ctx->spin_mode;
 		if (keydata.key == MLX_KEY_R && keydata.action == MLX_RELEASE)
 			reset_transforms(ctx);
+		if (keydata.key == MLX_KEY_C && keydata.action == MLX_RELEASE)
+			ctx->color_mode = !ctx->color_mode;
 	}
 }

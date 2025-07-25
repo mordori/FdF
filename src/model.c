@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:51 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 01:26:59 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 16:35:57 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,16 +39,16 @@ void	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
 	if (!tris)
 		return (free(verts), ft_error(mlx, "tris alloc"));
 	if (!vector_init(verts, true))
-		return (free(verts), free(tris), ft_error(mlx, "verts init"));
+		return (free(tris), fdf_free(verts, NULL, NULL, "verts init"));
 	if (parse_map(file, verts, &rows_cols) == ERROR || rows_cols.x < 2)
-		return (fdf_free(verts, NULL, NULL), free(tris), ft_error(mlx, "map"));
+		return (free(tris), fdf_free(verts, NULL, NULL, "parse map"));
 	if (!vector_init(tris, true))
-		return (fdf_free(verts, tris, NULL), ft_error(mlx, "tris init"));
+		return (fdf_free(verts, tris, NULL, "tris init"));
 	if (!make_triangles(tris, rows_cols))
-		return (fdf_free(verts, tris, NULL), ft_error(mlx, "tris fill"));
+		return (fdf_free(verts, tris, NULL, "make triangles"));
 	*ctx = malloc(sizeof (t_context));
 	if (!*ctx)
-		return (fdf_free(verts, tris, NULL), ft_error(mlx, "ctx alloc"));
+		return (fdf_free(verts, tris, NULL, "ctx alloc"));
 	(*ctx)->verts = verts;
 	(*ctx)->tris = tris;
 	(*ctx)->rows_cols = rows_cols;
@@ -119,7 +119,7 @@ static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img)
 
 	ctx->z_buf = malloc(sizeof(float) * img->width * img->height);
 	if (!ctx->z_buf)
-		return (fdf_free(ctx->verts, ctx->tris, ctx), ft_error(mlx, "z-buf"));
+		return (fdf_free(ctx->verts, ctx->tris, ctx, "z-buf alloc"));
 	while (i < img->width * img->height)
 		ctx->z_buf[i++] = INFINITY;
 	ctx->mlx = mlx;

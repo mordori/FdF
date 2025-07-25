@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 15:32:09 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 19:22:58 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ int	main(int argc, char *argv[])
 	mlx_resize_hook(mlx, resize, ctx);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
-	fdf_free(ctx->verts, ctx->tris, ctx);
+	fdf_free(ctx->verts, ctx->tris, ctx, NULL);
 	return (EXIT_SUCCESS);
 }
 
@@ -86,7 +86,6 @@ static inline void	loop(void *param)
 	time_color += ctx->mlx->delta_time;
 	render(ctx);
 	update_ui(ctx);
-	update_ui_2(ctx);
 }
 
 /**
@@ -100,18 +99,15 @@ static inline void	loop(void *param)
 void	resize(int width, int height, void *param)
 {
 	t_context	*ctx;
-	mlx_t		*mlx;
 
 	ctx = param;
-	mlx = ctx->mlx;
 	if (!ctx || !ctx->mlx || !ctx->img || width == 0 || height == 0)
 		return ;
 	free(ctx->z_buf);
 	ctx->z_buf = malloc(sizeof (float) * width * height);
 	if (!ctx->z_buf || !mlx_resize_image(ctx->img, width, height))
 	{
-		fdf_free(ctx->verts, ctx->tris, ctx);
-		ft_error(mlx, "resizing img failed");
+		fdf_free(ctx->verts, ctx->tris, ctx, "resizing failed");
 	}
 	frame(ctx);
 }
@@ -138,13 +134,18 @@ void	ft_error(mlx_t *mlx, char *message)
 /**
  * Frees the rendering context, Z-buffer, and the `verts` `tris` vector arrays.
  * Should not be called with a vector that has not called vector_init()!
+ * When a message is provided it means an error has occurred.
  *
  * @param verts Vertices vector array.
  * @param tris Triangles vector array.
  * @param ctx Rendering context containing Z-buffer.
+ * @param message Error message.
  */
-void	fdf_free(t_vector *verts, t_vector *tris, t_context *ctx)
+void	fdf_free(t_vector *verts, t_vector *tris, t_context *ctx, char *msg)
 {
+	mlx_t	*mlx;
+
+	mlx = ctx->mlx;
 	if (verts)
 		vector_free(verts);
 	if (tris)
@@ -154,4 +155,6 @@ void	fdf_free(t_vector *verts, t_vector *tris, t_context *ctx)
 	if (ctx)
 		free(ctx->z_buf);
 	free(ctx);
+	if (msg)
+		ft_error(mlx, msg);
 }

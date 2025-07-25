@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:14:56 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 22:15:38 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 19:46:57 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ t_vertex	*make_vert(float x, float y, float z, uint32_t color)
 	v->pos = vec4(x, -y, z, 1.0f);
 	v->color = color;
 	v->s = vec2i(0, 0);
-	v->z = 0.0f;
+	v->depth = 0.0f;
 	return (v);
 }
 
