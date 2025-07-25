@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 19:29:14 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 15:29:19 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/26 00:42:35 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ void	control_camera(void *param)
 	ctx = param;
 	if (ctx->cam.projection != ISOMETRIC)
 	{
+		control_fov(ctx);
 		mlx_get_mouse_pos(ctx->mlx, &pos.x, &pos.y);
 		if (ctx->cam.orbiting || ctx->cam.zooming)
 			lgc_m = vec2i(wrap_m_x(ctx, &pos), wrap_m_y(ctx, &pos));
@@ -58,7 +59,6 @@ void	control_camera(void *param)
 		if (!(ctx->cam.orbiting || ctx->cam.zooming || ctx->cam.panning))
 			return (mlx_set_cursor_mode(ctx->mlx, MLX_MOUSE_NORMAL));
 		mlx_set_cursor_mode(ctx->mlx, MLX_MOUSE_HIDDEN);
-		update_camera(&ctx->cam);
 	}
 }
 
@@ -130,7 +130,7 @@ mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_MIDDLE))
 			d = vec2i_sub(pos, prev);
 		cam->panning = true;
 		prev = pos;
-		speed = fmaxf(cam->distance, 1.0f);
+		speed = fmaxf(cam->distance, 1.0f) * (ctx->cam.fov / (M_PI / 2.5f));
 		speed *= ctx->mlx->delta_time * 60.0f * PAN_SENS;
 		forward = vec3_normalize(vec3_sub(cam->target, cam->eye));
 		right = vec3_normalize(vec3_cross(forward, cam->up));

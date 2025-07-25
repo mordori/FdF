@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:08:26 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 19:51:28 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/26 02:26:01 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ static inline void	render_line(t_context *ctx, int idx0, int idx1)
 	v0 = *(t_vertex *)vector_get(ctx->verts, idx0);
 	v1 = *(t_vertex *)vector_get(ctx->verts, idx1);
 	v0.o_pos = v0.pos;
-	v1.o_pos =  v1.pos;
+	v1.o_pos = v1.pos;
 	v0.pos = mat4_mul_vec4(ctx->m.mvp, v0.pos);
 	v1.pos = mat4_mul_vec4(ctx->m.mvp, v1.pos);
 	if (!liang_barsky_clip(&v0, &v1))

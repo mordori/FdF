@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 19:22:58 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/26 00:46:35 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ int	main(int argc, char *argv[])
 }
 
 /**
- * Main loop for camera update, rendering, and ui update.
+ * Main loop for camera, rendering, and ui.
  * Iterates the values used for spin and color features.
  *
  * @param param Rendering context.
@@ -70,6 +70,7 @@ static inline void	loop(void *param)
 	if (!ctx->img)
 		return ;
 	control_camera(ctx);
+	update_camera(&ctx->cam);
 	t = ctx->time_rot;
 	if (ctx->color_mode == AMAZING)
 	{

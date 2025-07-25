@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:51 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 16:35:57 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 20:51:30 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,5 +184,6 @@ void	reset_transforms(t_context *ctx)
 	ctx->cam.yaw = M_PI / 4.0f;
 	ctx->cam.pitch = atanf(1.0f / sqrtf(2.0f));
 	ctx->time_rot = 0.0;
+	ctx->cam.fov = M_PI / 2.5f;
 	frame(ctx);
 }

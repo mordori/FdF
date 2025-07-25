@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:18:33 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 19:47:08 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 23:02:37 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ t_mat4	view_matrix(t_cam cam)
 
 	forward = vec3_normalize(vec3_sub(cam.target, cam.eye));
 	right = vec3_normalize(vec3_cross(forward, cam.up));
-	up = vec3_cross(right, forward);
+	up = vec3_normalize(vec3_cross(right, forward));
 	view = mat4_identity();
 	view.m[0][0] = right.x;
 	view.m[0][1] = right.y;
@@ -142,10 +142,10 @@ t_mat4	proj_ortho(t_cam cam)
 	float	size;
 	float	aspect;
 
-	proj = mat4_identity();
 	size = cam.ortho_size;
 	aspect = cam.aspect;
 	sides = vec4(-size * aspect, size * aspect, -size, size);
+	proj = mat4_identity();
 	proj.m[0][0] = 2.0f / (sides.y - sides.x);
 	proj.m[1][1] = 2.0f / (sides.w - sides.z);
 	proj.m[2][2] = -2.0f / (cam.far - cam.near);

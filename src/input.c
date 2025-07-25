@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/23 23:56:47 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 16:23:44 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 20:48:17 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,15 +111,33 @@ void	key_hook(mlx_key_data_t keydata, void *param)
 			reset_transforms(ctx);
 		}
 	}
-	if (ctx->cam.projection != ISOMETRIC)
+	if (ctx->cam.projection == ISOMETRIC)
+		return ;
+	if (keydata.key == MLX_KEY_F && keydata.action == MLX_RELEASE)
+		frame(ctx);
+	if (keydata.key == MLX_KEY_SPACE && keydata.action == MLX_RELEASE)
+		ctx->spin_mode = !ctx->spin_mode;
+	if (keydata.key == MLX_KEY_R && keydata.action == MLX_RELEASE)
+		reset_transforms(ctx);
+	if (keydata.key == MLX_KEY_C && keydata.action == MLX_RELEASE)
+		ctx->color_mode = !ctx->color_mode;
+}
+
+void	control_fov(t_context *ctx)
+{
+	if (ctx->cam.projection == PERSPECTIVE)
 	{
-		if (keydata.key == MLX_KEY_F && keydata.action == MLX_RELEASE)
-			frame(ctx);
-		if (keydata.key == MLX_KEY_SPACE && keydata.action == MLX_RELEASE)
-			ctx->spin_mode = !ctx->spin_mode;
-		if (keydata.key == MLX_KEY_R && keydata.action == MLX_RELEASE)
-			reset_transforms(ctx);
-		if (keydata.key == MLX_KEY_C && keydata.action == MLX_RELEASE)
-			ctx->color_mode = !ctx->color_mode;
+		if (mlx_is_key_down(ctx->mlx, MLX_KEY_F1))
+		{
+			ctx->cam.fov -= ctx->mlx->delta_time;
+			ctx->cam.fov = ft_clamp(ctx->cam.fov, 0.523599f, M_PI / 1.3f);
+			compute_distance(ctx);
+		}
+		if (mlx_is_key_down(ctx->mlx, MLX_KEY_F2))
+		{
+			ctx->cam.fov += ctx->mlx->delta_time;
+			ctx->cam.fov = ft_clamp(ctx->cam.fov, 0.523599f, M_PI / 1.3f);
+			compute_distance(ctx);
+		}
 	}
 }

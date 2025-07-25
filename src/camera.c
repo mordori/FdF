@@ -6,13 +6,11 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 13:45:24 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 14:19:32 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 20:36:40 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
-
-static inline void	compute_distance(t_context *ctx);
 
 /**
  * Positions and updates the camera to frame the entire model within view.
@@ -97,7 +95,7 @@ void	init_camera(t_context *ctx)
  *
  * @param ctx Rendering context containing the camera and model bounds.
  */
-static inline void	compute_distance(t_context *ctx)
+void	compute_distance(t_context *ctx)
 {
 	const float	padding = 1.5f;
 	float		max_dim;

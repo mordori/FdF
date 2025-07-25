@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 01:10:00 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 18:06:11 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/26 01:37:32 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,13 +54,18 @@ static inline void	update_ui_2(t_context *ctx)
 {
 	static mlx_image_t	*controls;
 	char				*str;
+	int					y;
 
 	if (controls)
 		mlx_delete_image(ctx->mlx, controls);
+	if (ctx->cam.projection == PERSPECTIVE)
+		str = "[WASD]move  [ARROWS]rotate  [SPACE]spin  [F]frame  [F1-F2]fov";
+	else
+		str = "[WASD]move  [ARROWS]rotate  [SPACE]spin  [F]frame";
 	if (ctx->cam.projection != ISOMETRIC)
 	{
-		str = "[WASD]translate  [ARROWS]rotate  [SPACE]spin  [F]frame";
-		controls = mlx_put_string(ctx->mlx, str, 100, ft_imax(100, ctx->img->height - 145));
+		y = ft_imax(100, ctx->img->height - 145);
+		controls = mlx_put_string(ctx->mlx, str, 100, y);
 		if (!controls)
 			return (fdf_free(ctx->verts, ctx->tris, ctx, "ui 2"));
 		controls->instances[0].z = 101;
@@ -81,16 +86,17 @@ static inline void	update_ui_3(t_context *ctx)
 	str_i = "[ESC]quit  [P]projection [C]color  [R]reset";
 	if (ctx->cam.projection == ISOMETRIC)
 		str_i = "[ESC]quit  [P]projection";
-	info = mlx_put_string(ctx->mlx, str_i, 100, ft_imax(100, ctx->img->height - 75));
+	info = mlx_put_string(ctx->mlx, str_i, 100,
+				ft_imax(100, ctx->img->height - 75));
 	if (!info)
 			return (fdf_free(ctx->verts, ctx->tris, ctx, "ui 3-1"));
 	info->instances[0].z = 102;
-	if (ctx->cam.projection != ISOMETRIC)
-	{
-		str_c = "[ALT]+[MMB]pan   [ALT]+[RMB]zoom   [ALT]+[LMB]orbit";
-		controls = mlx_put_string(ctx->mlx, str_c, 100, ft_imax(100, ctx->img->height - 110));
-		if (!controls)
-			return (fdf_free(ctx->verts, ctx->tris, ctx, "ui 3-2"));
-		controls->instances[0].z = 103;
-	}
+	if (ctx->cam.projection == ISOMETRIC)
+		return ;
+	str_c = "[ALT]+[MMB]pan  [ALT]+[RMB]zoom  [ALT]+[LMB]orbit";
+	controls = mlx_put_string(ctx->mlx, str_c, 100,
+				ft_imax(100, ctx->img->height - 110));
+	if (!controls)
+		return (fdf_free(ctx->verts, ctx->tris, ctx, "ui 3-2"));
+	controls->instances[0].z = 103;
 }
