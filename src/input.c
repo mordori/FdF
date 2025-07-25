@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/23 23:56:47 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 02:48:04 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 03:54:59 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,40 +14,40 @@
 
 int	wrap_m_x(t_context *ctx, t_vec2i *pos)
 {
-	static int	revs_x;
+	static int	wraps;
 
 	if (pos->x >= (int)ctx->img->width - 1)
 	{
 		mlx_set_mouse_pos(ctx->mlx, 1, pos->y);
 		pos->x = 1;
-		++revs_x;
+		++wraps;
 	}
 	else if (pos->x <= 0)
 	{
 		mlx_set_mouse_pos(ctx->mlx, ctx->img->width - 2, pos->y);
 		pos->x = ctx->img->width - 2;
-		--revs_x;
+		--wraps;
 	}
-	return (revs_x * (ctx->img->width - 2));
+	return (wraps * (ctx->img->width - 2));
 }
 
 int	wrap_m_y(t_context *ctx, t_vec2i *pos)
 {
-	static int	revs_y;
+	static int	wraps;
 
 	if (pos->y >= (int)ctx->img->height - 1)
 	{
 		mlx_set_mouse_pos(ctx->mlx, pos->x, 1);
 		pos->y = 1;
-		++revs_y;
+		++wraps;
 	}
 	else if (pos->y <= 0)
 	{
 		mlx_set_mouse_pos(ctx->mlx, pos->x, ctx->img->height - 2);
 		pos->y = ctx->img->height - 2;
-		--revs_y;
+		--wraps;
 	}
-	return (revs_y * (ctx->img->height - 2));
+	return (wraps * (ctx->img->height - 2));
 }
 
 /**
@@ -109,13 +109,13 @@ void	key_hook(mlx_key_data_t keydata, void *param)
 			reset_transforms(ctx);
 	}
 	if (keydata.key == MLX_KEY_C && keydata.action == MLX_RELEASE)
-		ctx->colors = !ctx->colors;
+		ctx->color_mode = !ctx->color_mode;
 	if (ctx->cam.projection != ISOMETRIC)
 	{
 		if (keydata.key == MLX_KEY_F && keydata.action == MLX_RELEASE)
 			frame(ctx);
 		if (keydata.key == MLX_KEY_SPACE && keydata.action == MLX_RELEASE)
-			ctx->spin = !ctx->spin;
+			ctx->spin_mode = !ctx->spin_mode;
 		if (keydata.key == MLX_KEY_R && keydata.action == MLX_RELEASE)
 			reset_transforms(ctx);
 	}

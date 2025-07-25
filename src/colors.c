@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   rendering_utils.c                                  :+:      :+:    :+:   */
+/*   colors.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:09:05 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 17:13:31 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 01:19:19 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,17 @@ void	clear_image(t_context *ctx, uint32_t color)
 	}
 }
 
+uint32_t	rgba_to_abgr(uint32_t rgba)
+{
+	t_color	abgr;
+
+	abgr.a = (rgba & 0xFF) << 24;
+	abgr.b = (rgba & 0xFF00) << 8;
+	abgr.g = (rgba & 0xFF0000) >> 8;
+	abgr.r = (rgba & 0xFF000000) >> 24;
+	return (abgr.a | abgr.b | abgr.g | abgr.r);
+}
+
 /**
  * Interpolates two colors by first separating the color channels,
  * then interpolates them, and finally combines everything back into a 32-bit
@@ -76,58 +87,6 @@ uint32_t	lerp_color(uint32_t c1, uint32_t c2, float t)
 	return ((color.r << 24) | (color.g << 16) | (color.b << 8) | color.a);
 }
 
-/**
- * Updates the main UI elements (projection mode and control hints).
- *
- * @param ctx Render context containing camera and mlx context.
- */
-void	update_ui(t_context *ctx)
-{
-	static mlx_image_t	*proj;
-	static mlx_image_t	*info;
-	static mlx_image_t	*controls;
-	char				*str;
-
-	if (proj)
-		mlx_delete_image(ctx->mlx, proj);
-	if (info)
-		mlx_delete_image(ctx->mlx, info);
-	if (controls)
-		mlx_delete_image(ctx->mlx, controls);
-	if (ctx->cam.projection == ISOMETRIC)
-		proj = mlx_put_string(ctx->mlx, "Isometric", 100, 60);
-	if (ctx->cam.projection == ORTHOGRAPHIC)
-		proj = mlx_put_string(ctx->mlx, "Orthographic", 100, 60);
-	if (ctx->cam.projection == PERSPECTIVE)
-		proj = mlx_put_string(ctx->mlx, "Perspective", 100, 60);
-	str = "[ESC]quit  [C]color  [P]projection";
-	info = mlx_put_string(ctx->mlx, str, 100, ctx->img->height - 75);
-	info->instances[0].z = 101;
-	str = "[ALT]+[MMB]pan   [ALT]+[RMB]zoom   [ALT]+[LMB]orbit";
-	if (ctx->cam.projection == ISOMETRIC)
-		str = " ";
-	controls = mlx_put_string(ctx->mlx, str, 100, ctx->img->height - 110);
-	controls->instances[0].z = 102;
-}
-
-/**
- * Updates additional UI control hints.
- *
- * @param ctx Render context containing camera and mlx context.
- */
-void	update_ui_2(t_context *ctx)
-{
-	static mlx_image_t	*info;
-	char				*str;
-
-	if (info)
-		mlx_delete_image(ctx->mlx, info);
-	str = "[WASD]translate  [ARROWS]rotate  [SPACE]spin  [F]frame  [R]reset";
-	if (ctx->cam.projection == ISOMETRIC)
-		str = " ";
-	info = mlx_put_string(ctx->mlx, str, 100, ctx->img->height - 145);
-	info->instances[0].z = 103;
-}
 
 /**
  * Generates a time-based rainbow color. Uses offset sine waves to oscillate

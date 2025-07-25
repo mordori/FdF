@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:51 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 22:22:27 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 01:26:59 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,10 +128,10 @@ static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img)
 	ctx->transform.rot = vec3_n(0.0f);
 	ctx->transform.scale = vec3_n(1.0f);
 	ctx->alt_min_max = vec2i(INT_MAX, INT_MIN);
-	ctx->colors = DEFAULT;
+	ctx->color_mode = DEFAULT;
 	ctx->color = WHITE;
 	ctx->time_rot = 0.0;
-	ctx->spin = OFF;
+	ctx->spin_mode = OFF;
 	compute_bounds(ctx, OBJECT, 0, &v);
 	if (ctx->alt_min_max.x == ctx->alt_min_max.y)
 		ctx->alt_min_max.y = ctx->alt_min_max.x + 1;
@@ -177,7 +177,7 @@ static inline void	normalize_model(t_context *ctx)
  */
 void	reset_transforms(t_context *ctx)
 {
-	ctx->spin = OFF;
+	ctx->spin_mode = OFF;
 	ctx->transform.pos = vec3_n(0.0f);
 	ctx->transform.rot = vec3_n(0.0f);
 	ctx->transform.scale = vec3_n(1.0f);

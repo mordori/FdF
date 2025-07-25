@@ -6,16 +6,20 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:08:26 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 13:48:31 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 15:07:35 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-static inline void	render_line(t_context *ctx, int idx0, int idx1);
-static inline void	drwline(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 o);
-static inline void	movepixel(t_vec2i *d, t_vec2i *s, int *error, t_vertex *v0);
-static inline void	drawpixel(t_context *ctx, t_vertex v0, uint32_t c, float z);
+static inline void	render_line(
+						t_context *ctx, int idx0, int idx1);
+static inline void	draw_line(
+						t_context *ctx, t_vertex v0, t_vertex v1, float y0);
+static inline void	move_pixel(
+						t_vec2i *d, t_vec2i *s, int *error, t_vertex *v0);
+static inline void	draw_pixel(
+						t_context *ctx, t_vertex v0, uint32_t c);
 
 /**
  * Renders the wireframe grid from the triangle list.
@@ -61,8 +65,6 @@ void	render(void *param)
 }
 
 /**
- * Does not implement proper clipping yet.
- *
  * Line is rejected if both vertices are outside of the viewport,
  * or either is behind the camera.
  *
@@ -76,25 +78,19 @@ static inline void	render_line(t_context *ctx, int idx0, int idx1)
 {
 	t_vertex	*v0;
 	t_vertex	*v1;
-	t_vec2i		visible;
-	t_vec2i		s;
-	bool		v0_visible;
+	t_vec4		v_clip_0;
+	t_vec4		v_clip_1;
 
 	v0 = vector_get(ctx->verts, idx0);
 	v1 = vector_get(ctx->verts, idx1);
-	if (vert_to_screen(v0, ctx) && vert_to_screen(v1, ctx))
-	{
-		ctx->color = v0->color;
-		s = v0->s;
-		visible.x = s.x >= 0 && s.x < (int)ctx->img->width;
-		visible.y = s.y >= 0 && s.y < (int)ctx->img->height;
-		v0_visible = visible.x && visible.y;
-		s = v1->s;
-		visible.x = s.x >= 0 && s.x < (int)ctx->img->width;
-		visible.y = s.y >= 0 && s.y < (int)ctx->img->height;
-		if (v0_visible || (visible.x && visible.y))
-			drwline(ctx, *v0, *v1, vec3(0.0f, v0->pos.y, v0->z));
-	}
+	v_clip_0 = mat4_mul_vec4(ctx->m.mvp, v0->pos);
+	v_clip_1 = mat4_mul_vec4(ctx->m.mvp, v1->pos);
+	if (!liang_barsky(&v_clip_0, &v_clip_1))
+		return ;
+	project_to_screen(v0, ctx, v_clip_0);
+	project_to_screen(v1, ctx, v_clip_1);
+	ctx->color = v0->color;
+	draw_line(ctx, *v0, *v1, v0->pos.y);
 }
 
 /**
@@ -107,7 +103,8 @@ static inline void	render_line(t_context *ctx, int idx0, int idx1)
  * @param v1 Ending vertex (screen pos, color, depth)
  * @param o Auxiliary vector for depth and altitude interpolation.
  */
-static inline void	drwline(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 o)
+static inline void	draw_line(
+						t_context *ctx, t_vertex v0, t_vertex v1, float y0)
 {
 	t_vec2i	d;
 	t_vec2i	s;
@@ -122,16 +119,9 @@ static inline void	drwline(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 o)
 	while (steps.x <= steps.y)
 	{
 		t.x = (float)steps.x++ / steps.y;
-		ctx->color = lerp_color(v0.color, v1.color, t.x);
-		o.z = ft_lerp(v0.z, v1.z, t.x);
-		if (ctx->colors == AMAZING)
-		{
-			t.y = ft_lerp(o.y, v1.pos.y, t.x);
-			t.z = ft_normalize(t.y, ctx->alt_min_max.x, ctx->alt_min_max.y);
-			ctx->color = lerp_color(ctx->color1, ctx->color2, t.z);
-		}
-		drawpixel(ctx, v0, ctx->color, o.z);
-		movepixel(&d, &s, &error, &v0);
+		if (z_test(ctx, v0, v1, vec4_3(t, y0)))
+			draw_pixel(ctx, v0, ctx->color);
+		move_pixel(&d, &s, &error, &v0);
 	}
 }
 
@@ -145,7 +135,8 @@ static inline void	drwline(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 o)
  * @param error Accumulated error term, updated when stepping.
  * @param v0 Current vertex, screen-space coordinates updated in-place.
  */
-static inline void	movepixel(t_vec2i *d, t_vec2i *s, int *error, t_vertex *v0)
+static inline void	move_pixel(
+						t_vec2i *d, t_vec2i *s, int *error, t_vertex *v0)
 {
 	t_vec2i	*delta;
 	t_vec2i	*steps;
@@ -177,22 +168,24 @@ static inline void	movepixel(t_vec2i *d, t_vec2i *s, int *error, t_vertex *v0)
  * @param c Pixel color (32-bit RGBA).
  * @param z Interpolated depth value for the pixel, used for depth testing.
  */
-static inline void	drawpixel(t_context *ctx, t_vertex v0, uint32_t c, float z)
+static inline void	draw_pixel(
+						t_context *ctx, t_vertex v0, uint32_t c)
 {
-	int	x;
-	int	y;
-	int	index;
+	int			x;
+	int			y;
+	uint32_t	*pixels;
+	uint32_t	abgr_c;
 
 	x = v0.s.x;
 	y = v0.s.y;
+	pixels = (uint32_t *)ctx->img->pixels;
 	if (x >= 0 && x < (int)ctx->img->width && \
 y >= 0 && y < (int)ctx->img->height)
 	{
-		index = y * ctx->img->width + x;
-		if (z < ctx->z_buf[index])
-		{
-			ctx->z_buf[index] = z;
-			mlx_put_pixel(ctx->img, x, y, c);
-		}
+		abgr_c =	(c & 0xFF) << 24 |
+					(c & 0xFF00) << 8 |
+					(c & 0xFF0000) >> 8 |
+					(c & 0xFF000000) >> 24;
+		pixels[y * ctx->img->width + x] = abgr_c;
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:18:33 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 17:09:36 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 06:46:42 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,16 +34,10 @@
  * @param ctx Rendering context containing the camera and transformations.
  * @return `true` if the vertex is in front of the camera, `false` otherwise.
  */
-bool	vert_to_screen(t_vertex *vert, t_context *ctx)
+bool	project_to_screen(t_vertex *vert, t_context *ctx, t_vec4 v_clip)
 {
-	t_mat4	mvp;
-	t_vec4	v_clip;
 	t_vec3	v_ndc;
 
-	mvp = ctx->m.mvp;
-	v_clip = mat4_mul_vec4(mvp, vert->pos);
-	if (v_clip.w <= 0.0f)
-		return (false);
 	v_ndc = vec3_scale(vec3_4(v_clip), 1.0f / v_clip.w);
 	vert->s.x = (v_ndc.x + 1.0f) * 0.5f * ctx->img->width;
 	vert->s.y = (1.0f - v_ndc.y) * 0.5f * ctx->img->height;

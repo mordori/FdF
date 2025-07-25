@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   camera_controller.c                                :+:      :+:    :+:   */
+/*   camera_controls.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 19:29:14 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 12:30:27 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 15:29:19 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	control_camera(void *param)
 		mlx_get_mouse_pos(ctx->mlx, &pos.x, &pos.y);
 		if (ctx->cam.orbiting || ctx->cam.zooming)
 			lgc_m = vec2i(wrap_m_x(ctx, &pos), wrap_m_y(ctx, &pos));
-		if (ctx->spin == OFF)
+		if (ctx->spin_mode == OFF)
 			translate_rotate(ctx);
 		if (!ctx->cam.zooming && !ctx->cam.panning)
 			orbit(ctx, vec2i_add(pos, lgc_m), vec2i(0, 0));
@@ -130,7 +130,8 @@ mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_MIDDLE))
 			d = vec2i_sub(pos, prev);
 		cam->panning = true;
 		prev = pos;
-		speed = cam->distance * ctx->mlx->delta_time * 60.0f * PAN_SENS;
+		speed = fmaxf(cam->distance, 1.0f);
+		speed *= ctx->mlx->delta_time * 60.0f * PAN_SENS;
 		forward = vec3_normalize(vec3_sub(cam->target, cam->eye));
 		right = vec3_normalize(vec3_cross(forward, cam->up));
 		up = vec3_normalize(vec3_cross(right, forward));

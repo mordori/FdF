@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:04:16 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 22:12:41 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 00:01:31 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ static inline int	init_line(char *line, char ***elements)
 {
 	size_t	len;
 
+	*elements = NULL;
 	len = ft_strlen(line);
 	if (len < 1)
 		return (ERROR);

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   fdf.c                                              :+:      :+:    :+:   */
+/*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 19:11:31 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 15:32:09 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,18 +20,7 @@ static inline void	loop(void *param);
  * Follows an OpenGL-style right-handed coordinate convention,
  * where Y is up, X is to the right, and in view space the camera looks down -Z.
  *
- * Known flaws:
- *
- * - Clipping is implemented only partially.
- *
- * - Lines on the last row and column of triangles are rendered twice.
- *
- * - Inadequate performance with higher vertex amounts, there is much
- * optimization that could be done.
- *
- * - Panning could to be more accurate.
- *
- * - Orthographic projections easily introduce an optical illusion where the
+ * Orthographic projections easily introduce an optical illusion where the
  * model seemingly flips at certain camera angles.
  *
  * Main initializes mlx context, render imgage, sets the loop hooks,
@@ -82,12 +71,12 @@ static inline void	loop(void *param)
 		return ;
 	control_camera(ctx);
 	t = ctx->time_rot;
-	if (ctx->colors == AMAZING)
+	if (ctx->color_mode == AMAZING)
 	{
 		ctx->color1 = rainbow_rgb(-time_color * 2.0f + M_PI_2);
 		ctx->color2 = rainbow_rgb(-time_color * 2.0f);
 	}
-	if (ctx->spin == ON)
+	if (ctx->spin_mode == ON)
 	{
 		ctx->transform.rot.x = t * 0.5f;
 		ctx->transform.rot.y = sinf(t * 0.1f);
@@ -98,4 +87,71 @@ static inline void	loop(void *param)
 	render(ctx);
 	update_ui(ctx);
 	update_ui_2(ctx);
+}
+
+/**
+ * Resize hook, sets the render image to new dimensions.
+ * Frames the model with the new aspect.
+ *
+ * @param width New window width.
+ * @param height New window height.
+ * @param param Rendering context containing render image and Z-buffer.
+ */
+void	resize(int width, int height, void *param)
+{
+	t_context	*ctx;
+	mlx_t		*mlx;
+
+	ctx = param;
+	mlx = ctx->mlx;
+	if (!ctx || !ctx->mlx || !ctx->img || width == 0 || height == 0)
+		return ;
+	free(ctx->z_buf);
+	ctx->z_buf = malloc(sizeof (float) * width * height);
+	if (!ctx->z_buf || !mlx_resize_image(ctx->img, width, height))
+	{
+		fdf_free(ctx->verts, ctx->tris, ctx);
+		ft_error(mlx, "resizing img failed");
+	}
+	frame(ctx);
+}
+
+/**
+ * Logs errors on stderr and terminates mlx before exiting.
+ *
+ * @param mlx Mlx context.
+ * @param message Error message.
+ */
+void	ft_error(mlx_t *mlx, char *message)
+{
+	ft_putstr_fd("FdF:\tError: ", STDERR_FILENO);
+	ft_putendl_fd(message, STDERR_FILENO);
+	if (mlx)
+	{
+		ft_putstr_fd("MLX42:\t", STDERR_FILENO);
+		perror(mlx_strerror(mlx_errno));
+		mlx_terminate(mlx);
+	}
+	exit(EXIT_FAILURE);
+}
+
+/**
+ * Frees the rendering context, Z-buffer, and the `verts` `tris` vector arrays.
+ * Should not be called with a vector that has not called vector_init()!
+ *
+ * @param verts Vertices vector array.
+ * @param tris Triangles vector array.
+ * @param ctx Rendering context containing Z-buffer.
+ */
+void	fdf_free(t_vector *verts, t_vector *tris, t_context *ctx)
+{
+	if (verts)
+		vector_free(verts);
+	if (tris)
+		vector_free(tris);
+	free(verts);
+	free(tris);
+	if (ctx)
+		free(ctx->z_buf);
+	free(ctx);
 }

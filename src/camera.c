@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 13:45:24 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 22:40:17 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 14:19:32 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,11 +81,11 @@ void	init_camera(t_context *ctx)
 	ctx->cam.pitch = atanf(1.0f / sqrtf(2.0f));
 	ctx->cam.fov = M_PI / 2.5f;
 	ctx->cam.near = 0.1f;
-	ctx->cam.far = 100.0f;
 	ctx->cam.panning = false;
 	ctx->cam.zooming = false;
 	ctx->cam.orbiting = false;
 	compute_distance(ctx);
+	ctx->cam.far = 8.0f * ctx->cam.distance;
 	update_camera(&ctx->cam);
 }
 

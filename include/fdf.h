@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 22:37:25 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 19:10:06 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/25 15:25:26 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,17 +56,17 @@ typedef enum e_proj
 	PERSPECTIVE
 }				t_proj;
 
-typedef enum e_colors
+typedef enum e_color_mode
 {
 	DEFAULT,
 	AMAZING
-}				t_colors;
+}				t_color_mode;
 
-typedef enum e_spin
+typedef enum e_spin_mode
 {
 	OFF,
 	ON
-}				t_spin;
+}				t_spin_mode;
 
 typedef struct s_cam
 {
@@ -100,24 +100,24 @@ typedef struct s_matrices
 
 typedef struct s_context
 {
-	mlx_t		*mlx;
-	mlx_image_t	*img;
-	float		*z_buf;
-	t_vector	*verts;
-	t_vector	*tris;
-	t_vec2i		rows_cols;
-	t_vec2i		alt_min_max;
-	t_vec3		center;
-	t_vec3		bounds;
-	t_transform	transform;
-	t_cam		cam;
-	t_colors	colors;
-	t_spin		spin;
-	uint32_t	color;
-	uint32_t	color1;
-	uint32_t	color2;
-	double		time_rot;
-	t_matrices	m;
+	mlx_t			*mlx;
+	mlx_image_t		*img;
+	float			*z_buf;
+	t_vector		*verts;
+	t_vector		*tris;
+	t_vec2i			rows_cols;
+	t_vec2i			alt_min_max;
+	t_vec3			center;
+	t_vec3			bounds;
+	t_transform		transform;
+	t_cam			cam;
+	t_color_mode	color_mode;
+	t_spin_mode		spin_mode;
+	uint32_t		color;
+	uint32_t		color1;
+	uint32_t		color2;
+	double			time_rot;
+	t_matrices		m;
 }				t_context;
 
 int			parse_map(char *map, t_vector *verts, t_vec2i *rows_cols);
@@ -127,7 +127,7 @@ bool		make_triangles(t_vector *tris, t_vec2i rows_cols);
 void		clear_image(t_context *ctx, uint32_t color);
 void		render(void *param);
 void		fdf_free(t_vector *verts, t_vector *tris, t_context *ctx);
-bool		vert_to_screen(t_vertex *vert, t_context *ctx);
+bool		project_to_screen(t_vertex *vert, t_context *ctx, t_vec4 v_clip);
 void		update_camera(t_cam *cam);
 void		init_camera(t_context *ctx);
 void		update_ui(t_context *ctx);
@@ -151,5 +151,8 @@ void		compute_bounds(t_context *ctx, t_space space,
 				size_t i, t_vertex *v);
 void		initialize(char *file, t_context **ctx,
 				mlx_t *mlx, mlx_image_t *img);
+uint32_t	rgba_to_abgr(uint32_t rgba);
+bool 		liang_barsky(t_vec4 *v0, t_vec4 *v1);
+bool		z_test(t_context *ctx, t_vertex v0, t_vertex v1, t_vec4 t);
 
 #endif
