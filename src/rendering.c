@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:08:26 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/29 16:59:43 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/29 19:33:36 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,10 +189,10 @@ static inline void	draw_pixel(
 	if (x >= 0 && x < (int)ctx->img->width && \
 y >= 0 && y < (int)ctx->img->height)
 	{
-		abgr_c =	(c & 0xFF) << 24 |
-					(c & 0xFF00) << 8 |
-					(c & 0xFF0000) >> 8 |
-					(c & 0xFF000000) >> 24;
+		abgr_c = (c & 0xFF) << 24 | \
+(c & 0xFF00) << 8 | \
+(c & 0xFF0000) >> 8 | \
+(c & 0xFF000000) >> 24;
 		pixels[y * ctx->img->width + x] = abgr_c;
 	}
 }

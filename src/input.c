@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/23 23:56:47 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 20:48:17 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/29 19:46:00 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,13 +127,13 @@ void	control_fov(t_context *ctx)
 {
 	if (ctx->cam.projection == PERSPECTIVE)
 	{
-		if (mlx_is_key_down(ctx->mlx, MLX_KEY_F1))
+		if (mlx_is_key_down(ctx->mlx, MLX_KEY_U))
 		{
 			ctx->cam.fov -= ctx->mlx->delta_time;
 			ctx->cam.fov = ft_clamp(ctx->cam.fov, 0.523599f, M_PI / 1.3f);
 			compute_distance(ctx);
 		}
-		if (mlx_is_key_down(ctx->mlx, MLX_KEY_F2))
+		if (mlx_is_key_down(ctx->mlx, MLX_KEY_I))
 		{
 			ctx->cam.fov += ctx->mlx->delta_time;
 			ctx->cam.fov = ft_clamp(ctx->cam.fov, 0.523599f, M_PI / 1.3f);

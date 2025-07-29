@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 19:29:14 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/29 13:07:41 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/29 19:45:04 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ static inline void	zoom(t_context *ctx, t_vec2i pos);
  *
  * - Zooming in/out				(Right Mouse Button).
  *
- * - Change fov					(F1 - F2).
+ * - Change fov					(U - I).
  *
  * Uses a logical mouse position that wraps around the screen for
  * zooming and orbiting.

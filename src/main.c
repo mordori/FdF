@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/26 00:46:35 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/29 19:47:25 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@ static inline void	loop(void *param);
  *
  * Orthographic projections easily introduce an optical illusion where the
  * model seemingly flips at certain camera angles.
+ *
+ * Panning still needs to be improved.
  *
  * Main initializes mlx context, render imgage, sets the loop hooks,
  * and begins model initialization.

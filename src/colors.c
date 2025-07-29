@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:09:05 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 01:19:19 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/29 19:31:30 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,6 @@ uint32_t	lerp_color(uint32_t c1, uint32_t c2, float t)
 	color.a = (uint8_t)ft_lerp(color1.a, color2.a, t);
 	return ((color.r << 24) | (color.g << 16) | (color.b << 8) | color.a);
 }
-
 
 /**
  * Generates a time-based rainbow color. Uses offset sine waves to oscillate

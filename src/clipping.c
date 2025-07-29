@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 02:40:17 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/29 14:39:52 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/29 19:32:31 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ static inline bool	clip_test(float p, float q, float *t0, float *t1);
  * @param v1 Second vertex of the line.
  * @return True if the clipped segment is visible.
  */
-bool liang_barsky_clip(t_vertex *v0, t_vertex *v1)
+bool	liang_barsky_clip(t_vertex *v0, t_vertex *v1)
 {
 	t_vec2	t;
 	t_vec4	d;
@@ -64,7 +64,7 @@ bool liang_barsky_clip(t_vertex *v0, t_vertex *v1)
  * @param v1 Second vertex of the line.
  * @return True if the clipped segment is visible within the screen.
  */
-bool liang_barsky_screen(t_context *ctx, t_vertex *v0, t_vertex *v1)
+bool	liang_barsky_screen(t_context *ctx, t_vertex *v0, t_vertex *v1)
 {
 	t_vec2	t;
 	t_vec2	d;

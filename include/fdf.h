@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 22:37:25 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/29 11:59:09 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/29 19:32:09 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,7 +126,8 @@ void		ft_error(mlx_t *mlx, char *message);
 bool		make_triangles(t_vector *tris, t_vec2i rows_cols);
 void		clear_image(t_context *ctx, uint32_t color);
 void		render(void *param);
-void		fdf_free(t_vector *verts, t_vector *tris, t_context *ctx, char *msg);
+void		fdf_free(t_vector *verts, t_vector *tris,
+				t_context *ctx, char *msg);
 bool		project_to_screen(t_vertex *vert, t_context *ctx);
 void		update_camera(t_cam *cam);
 void		init_camera(t_context *ctx);
