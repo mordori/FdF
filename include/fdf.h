@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 22:37:25 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 20:36:46 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/29 11:59:09 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,8 +151,8 @@ void		compute_bounds(t_context *ctx, t_space space,
 void		initialize(char *file, t_context **ctx,
 				mlx_t *mlx, mlx_image_t *img);
 uint32_t	rgba_to_abgr(uint32_t rgba);
-bool 		liang_barsky_clip(t_vertex *v0, t_vertex *v1);
-bool 		liang_barsky_screen(t_context *ctx, t_vec4 *v);
+bool		liang_barsky_clip(t_vertex *v0, t_vertex *v1);
+bool		liang_barsky_screen(t_context *ctx, t_vertex *v0, t_vertex *v1);
 bool		depth_test(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 t);
 void		control_fov(t_context *ctx);
 void		compute_distance(t_context *ctx);

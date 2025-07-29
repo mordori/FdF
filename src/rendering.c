@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:08:26 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/26 02:26:01 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/29 16:59:43 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ static inline void	draw_pixel(
  *
  * Clears the render image first to a solid color and default the Z-buffer.
  *
- * Then, for every tringle in the mesh:
+ * Computes and stores the combined MVP matrix.
  *
  * - For every second triangle, top and left edges are drawn.
  *
@@ -65,10 +65,14 @@ void	render(void *param)
 }
 
 /**
- * Line is rejected if both vertices are outside of the viewport,
- * or either is behind the camera.
+ * Copies the vertices on a line to preserve the original ones.
+ * Then the MVP matrix is applied to the copies, transforming them into
+ * clip space.
  *
- * Pixels on a line outside the screen are not drawn, but they are computed.
+ * Liang-Barsky clipping method first clips the vertices in clip space. Then,
+ * the vertices are transformed into screen space and Liang-Barsky is
+ * applied in screen space to ensure only the vertices inside the screen
+ * dimensions are drawn.
  *
  * @param ctx Rendering context containing vertices, render image, and color.
  * @param idx0 Index for vertex 0.
@@ -78,7 +82,6 @@ static inline void	render_line(t_context *ctx, int idx0, int idx1)
 {
 	t_vertex	v0;
 	t_vertex	v1;
-	t_vec4		s_clip;
 
 	v0 = *(t_vertex *)vector_get(ctx->verts, idx0);
 	v1 = *(t_vertex *)vector_get(ctx->verts, idx1);
@@ -90,11 +93,8 @@ static inline void	render_line(t_context *ctx, int idx0, int idx1)
 		return ;
 	project_to_screen(&v0, ctx);
 	project_to_screen(&v1, ctx);
-	s_clip = vec4(v0.s.x, v0.s.y, v1.s.x, v1.s.y);
-	if (!liang_barsky_screen(ctx, &s_clip))
+	if (!liang_barsky_screen(ctx, &v0, &v1))
 		return ;
-	v0.s = vec2i_f(s_clip.x, s_clip.y);
-	v1.s = vec2i_f(s_clip.z, s_clip.w);
 	ctx->color = v0.color;
 	draw_line(ctx, v0, v1);
 }
@@ -104,10 +104,12 @@ static inline void	render_line(t_context *ctx, int idx0, int idx1)
  * as best approximation to the ideal line.
  * Interpolates both color and depth (z) along the line.
  *
+ * Draws the pixel if it passes depth test against previously drawn pixel
+ * at the same location.
+ *
  * @param ctx Rendering context containing colors and altitude range.
  * @param v0 Starting vertex (screen pos, color, depth)
  * @param v1 Ending vertex (screen pos, color, depth)
- * @param o Auxiliary vector for depth and altitude interpolation.
  */
 static inline void	draw_line(
 						t_context *ctx, t_vertex v0, t_vertex v1)
@@ -115,16 +117,16 @@ static inline void	draw_line(
 	t_vec2i	d;
 	t_vec2i	s;
 	int		error;
-	t_vec2i	steps;
+	t_vec2i	iterations;
 	t_vec3	t;
 
 	d = vec2i(abs(v1.s.x - v0.s.x), abs(v1.s.y - v0.s.y));
 	s = vec2i(1 + (-2 * (v0.s.x >= v1.s.x)), 1 + (-2 * (v0.s.y >= v1.s.y)));
 	error = d.x - d.y;
-	steps = vec2i(0.0f, ft_imax(d.x, d.y));
-	while (steps.x <= steps.y)
+	iterations = vec2i(0, ft_imax(d.x, d.y));
+	while (iterations.x <= iterations.y)
 	{
-		t.x = (float)steps.x++ / steps.y;
+		t.x = (float)iterations.x++ / iterations.y;
 		if (depth_test(ctx, v0, v1, t))
 			draw_pixel(ctx, v0, ctx->color);
 		move_pixel(&d, &s, &error, &v0);
@@ -145,34 +147,33 @@ static inline void	move_pixel(
 						t_vec2i *d, t_vec2i *s, int *error, t_vertex *v0)
 {
 	t_vec2i	*delta;
-	t_vec2i	*steps;
+	t_vec2i	*slope;
 	t_vec2i	*screen;
 	int		e2;
 
 	delta = d;
-	steps = s;
+	slope = s;
 	screen = &(v0->s);
 	e2 = 2 * (*error);
 	if (e2 > -delta->y)
 	{
 		*error -= delta->y;
-		screen->x += steps->x;
+		screen->x += slope->x;
 	}
 	if (e2 < delta->x)
 	{
 		*error += delta->x;
-		screen->y += steps->y;
+		screen->y += slope->y;
 	}
 }
 
 /**
- * Draws a pixel if it is within the render image boundaries and
- * and passes the depth test against the Z-buffer. Updates Z-buffer when drawn.
+ * Stores a pixel in the framebuffer if it is within the render image
+ * boundaries. The framebuffer uses 32-bit ABGR colors.
  *
  * @param ctx Rendering context containing render image and Z-buffer.
  * @param v0 Current vertex with interpolated screen-space coordinates (x, y).
  * @param c Pixel color (32-bit RGBA).
- * @param z Interpolated depth value for the pixel, used for depth testing.
  */
 static inline void	draw_pixel(
 						t_context *ctx, t_vertex v0, uint32_t c)

@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 02:40:17 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/26 01:33:43 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/29 14:39:52 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,19 @@
 
 static inline bool	clip_test(float p, float q, float *t0, float *t1);
 
+/**
+ * Performs Liang-Barsky clipping in homogeneous clip space (3D).
+ * The function clips geometry outside the camera’s viewing frustum
+ * defined by near, far, left, right, top, and bottom planes (-w <= x,y,z <= w).
+ *
+ * If the line segment lies partially outside the view volume, the function
+ * modifies `v0` and/or `v1` to clip them. Colors are interpolated at clipped
+ * points for smooth shading.
+ *
+ * @param v0 First vertex of the line.
+ * @param v1 Second vertex of the line.
+ * @return True if the clipped segment is visible.
+ */
 bool liang_barsky_clip(t_vertex *v0, t_vertex *v1)
 {
 	t_vec2	t;
@@ -41,31 +54,52 @@ bool liang_barsky_clip(t_vertex *v0, t_vertex *v1)
 	return (true);
 }
 
-bool liang_barsky_screen(t_context *ctx, t_vec4 *v)
+/**
+ * Clips a line segment against the screen boundaries.
+ * This is a 2D variant of the Liang-Barsky algorithm. It operates on a
+ * rectangle defined by the screen's pixel boundaries (0, width/height).
+ *
+ * @param ctx Render context containing screen dimensions.
+ * @param v0 First vertex of the line.
+ * @param v1 Second vertex of the line.
+ * @return True if the clipped segment is visible within the screen.
+ */
+bool liang_barsky_screen(t_context *ctx, t_vertex *v0, t_vertex *v1)
 {
 	t_vec2	t;
 	t_vec2	d;
 
 	t = vec2(0.0f, 1.0f);
-	d = vec2(v->z - v->x, v->w - v->y);
-	if ((!clip_test(-d.x, v->x, &t.x, &t.y)) || \
-(!clip_test(d.x, ctx->img->width - 1 - v->x, &t.x, &t.y)) || \
-(!clip_test(-d.y, v->y, &t.x, &t.y)) || \
-(!clip_test(d.y, ctx->img->height - 1 - v->y, &t.x, &t.y)))
+	d = vec2(v1->s.x - v0->s.x, v1->s.y - v0->s.y);
+	if ((!clip_test(-d.x, v0->s.x, &t.x, &t.y)) || \
+(!clip_test(d.x, ctx->img->width - 1 - v0->s.x, &t.x, &t.y)) || \
+(!clip_test(-d.y, v0->s.y, &t.x, &t.y)) || \
+(!clip_test(d.y, ctx->img->height - 1 - v0->s.y, &t.x, &t.y)))
 		return (false);
 	if (t.y < 1.0f)
 	{
-		v->z = v->x + t.y * d.x;
-		v->w = v->y + t.y * d.y;
+		v1->s.x = v0->s.x + t.y * d.x;
+		v1->s.y = v0->s.y + t.y * d.y;
 	}
 	if (t.x > 0.0f)
 	{
-		v->x += t.x * d.x;
-		v->y += t.x * d.y;
+		v0->s.x += t.x * d.x;
+		v0->s.y += t.x * d.y;
 	}
 	return (true);
 }
 
+/**
+ * Determines whether a segment lies within the clipping bounds for a single
+ * boundary. Adjusts the `t0` and `t1` parameters, which represent the
+ * parametric range of the visible segment (0 <= t <= 1).
+ *
+ * @param p Directional component of the line relative to the clipping boundary.
+ * @param q Distance from the line's starting point to the clipping boundary.
+ * @param t0 Minimum visible parameter of the line segment.
+ * @param t1 Maximum visible parameter of the line segment.
+ * @return True if the segment is at least partially within the boundary.
+ */
 static inline bool	clip_test(float p, float q, float *t0, float *t1)
 {
 	float	t;

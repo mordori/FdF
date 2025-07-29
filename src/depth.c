@@ -6,12 +6,29 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 15:08:22 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 19:50:59 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/29 12:51:22 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
+/**
+ * Performs a depth test for a pixel and updates the z-buffer if visible.
+ *
+ * Interpolates the depth of the current pixel along the line
+ * segment between `v0` and `v1`, using the interpolation parameter `t.x`.
+ * The computed depth is compared against the z-buffer at the (x, y)
+ * screen coordinates.
+ *
+ * If the pixel is closer than the current value in the z-buffer,
+ * the function updates the z-buffer and sets the color to be drawn.
+ *
+ * @param ctx   Rendering context containing the z-buffer and color settings.
+ * @param v0    Starting vertex of the segment.
+ * @param v1    Ending vertex of the segment.
+ * @param t     Interpolation parameters.
+ * @return      True if the pixel passes the depth test and should be drawn.
+ */
 bool	depth_test(t_context *ctx, t_vertex v0, t_vertex v1, t_vec3 t)
 {
 	float	depth;

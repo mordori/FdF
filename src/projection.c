@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:18:33 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 23:02:37 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/29 12:40:15 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ bool	project_to_screen(t_vertex *vert, t_context *ctx)
 	t_vec3	v_ndc;
 
 	v_ndc = vec3_scale(vec3_4(vert->pos), 1.0f / vert->pos.w);
-	vert->s.x = (v_ndc.x + 1.0f) * 0.5f * ctx->img->width;
-	vert->s.y = (1.0f - v_ndc.y) * 0.5f * ctx->img->height;
+	vert->s.x = (v_ndc.x + 1.0f) * 0.5f * (ctx->img->width - 1);
+	vert->s.y = (1.0f - v_ndc.y) * 0.5f * (ctx->img->height - 1);
 	vert->depth = (v_ndc.z + 1.0f) * 0.5f;
 	return (true);
 }

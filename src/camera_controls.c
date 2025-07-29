@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 19:29:14 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/26 00:42:35 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/29 13:07:41 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,14 +21,13 @@ static inline void	zoom(t_context *ctx, t_vec2i pos);
  *
  * - Translation and rotation	(WASD / ARROW keys).
  *
- * - Orbiting around a target	(Left ALT + Left Mouse Button).
+ * - Orbiting around a target	(Left Mouse Button).
  *
- * - Panning the camera			(Left ALT + Middle Mouse Button).
+ * - Panning the camera			(Middle Mouse Button).
  *
- * - Zooming in/out				(Left ALT + Right Mouse Button).
+ * - Zooming in/out				(Right Mouse Button).
  *
- * With active camera motion, `update_camera()` is called to recalculate
- * the camera's `eye` position from updated pitch, yaw, and distance.
+ * - Change fov					(F1 - F2).
  *
  * Uses a logical mouse position that wraps around the screen for
  * zooming and orbiting.
@@ -63,7 +62,7 @@ void	control_camera(void *param)
 }
 
 /**
- * Orbits the camera around the target `Left ALT + Left Mouse Button` is held.
+ * Orbits the camera around the target `Left Mouse Button` is held.
  *
  * Calculates mouse deltas and adjusts the camera's `yaw` and `pitch` angles.
  *
@@ -71,7 +70,7 @@ void	control_camera(void *param)
  *
  * @param ctx Rendering context containing camera and mlx context.
  * @param pos Logical mouse position.
- * @param d Auxialiry delta vec2i.
+ * @param d Auxialiry vector for mouse movement delta.
  */
 static inline void	orbit(t_context *ctx, t_vec2i pos, t_vec2i d)
 {
@@ -79,8 +78,7 @@ static inline void	orbit(t_context *ctx, t_vec2i pos, t_vec2i d)
 	static t_vec2i	orig;
 	float			speed;
 
-	if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
-mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_LEFT))
+	if (mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_LEFT))
 	{
 		if (!ctx->cam.orbiting)
 			mlx_get_mouse_pos(ctx->mlx, &orig.x, &orig.y);
@@ -103,16 +101,16 @@ mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_LEFT))
 }
 
 /**
- * Pans the camera target when `Left ALT + Middle Mouse Button` is held.
+ * Pans the camera target when `Middle Mouse Button` is held.
  *
  * Calculates the x and y movement of the mouse and moves the camera's `target`
- * accordingly. Panning speed is proportional to `cam->distance`.
+ * accordingly. Panning speed is proportional to distance and fov.
  *
  * Frame-rate independent.
  *
  * @param ctx Rendering context containing mlx context.
  * @param cam Camera.
- * @param d Mouse movement delta.
+ * @param d Auxialiry vector for mouse movement delta.
  * @param pos Current mouse position.
  */
 static inline void	pan(t_context *ctx, t_cam *cam, t_vec2i d, t_vec2i pos)
@@ -123,8 +121,7 @@ static inline void	pan(t_context *ctx, t_cam *cam, t_vec2i d, t_vec2i pos)
 	t_vec3			right;
 	t_vec3			up;
 
-	if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
-mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_MIDDLE))
+	if (mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_MIDDLE))
 	{
 		if (cam->panning)
 			d = vec2i_sub(pos, prev);
@@ -143,10 +140,10 @@ mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_MIDDLE))
 }
 
 /**
- * Zooms the camera in/out when `Left ALT + Right Mouse Button` is held.
+ * Zooms the camera in/out when `Right Mouse Button` is held.
  *
- * Measures vertical mouse movement and adjusts `cam.distance`,
- * clamped to a minimum of `0.1f`. Updates `ortho_size` proportionally.
+ * Measures vertical mouse movement and adjusts distance,
+ * clamped to a minimum of 0.1f. Updates `ortho_size` proportionally.
  *
  * Frame-rate independent.
  *
@@ -160,8 +157,7 @@ static inline void	zoom(t_context *ctx, t_vec2i pos)
 	float			speed;
 	float			delta;
 
-	if (mlx_is_key_down(ctx->mlx, MLX_KEY_LEFT_ALT) && \
-mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_RIGHT))
+	if (mlx_is_mouse_down(ctx->mlx, MLX_MOUSE_BUTTON_RIGHT))
 	{
 		if (!ctx->cam.zooming)
 			mlx_get_mouse_pos(ctx->mlx, &orig.x, &orig.y);
