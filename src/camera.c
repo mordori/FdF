@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 13:45:24 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/29 13:31:52 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/29 20:04:46 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void	init_camera(t_context *ctx)
 	ctx->cam.target = vec3_n(0.0f);
 	ctx->cam.up = vec3(0.0f, 1.0f, 0.0f);
 	ctx->cam.yaw = M_PI / 4.0f;
-	ctx->cam.pitch = M_PI / 5.1f;
+	ctx->cam.pitch = atanf(1.0f / sqrtf(2.0f));
 	ctx->cam.fov = M_PI / 2.5f;
 	ctx->cam.near = 0.1f;
 	ctx->cam.panning = false;
