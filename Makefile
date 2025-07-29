@@ -6,7 +6,7 @@
 #    By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/30 16:50:13 by myli-pen          #+#    #+#              #
-#    Updated: 2025/07/29 20:43:09 by myli-pen         ###   ########.fr        #
+#    Updated: 2025/07/29 22:04:49 by myli-pen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -94,7 +94,10 @@ fclean: clean
 		rm -rf $(DIR_LIB); \
 		echo "$(RED) [-]$(COLOR) removed $(DIR_LIB)"; \
 	fi
-	@rm -f $(NAME)
+	@if [ -e "$(NAME)" ]; then \
+		rm -f $(NAME); \
+		echo "$(RED) [-]$(COLOR) removed $(NAME)"; \
+	fi
 
 re: fclean all
 
