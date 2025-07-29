@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/29 21:46:06 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/29 21:54:09 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,10 +103,8 @@ static inline void	loop(void *param)
 void	resize(int width, int height, void *param)
 {
 	t_context	*ctx;
-	mlx_t		*mlx;
 
 	ctx = param;
-	mlx = ctx->mlx;
 	if (!ctx || !ctx->mlx || !ctx->img || width == 0 || height == 0)
 		return ;
 	free(ctx->z_buf);
@@ -114,7 +112,7 @@ void	resize(int width, int height, void *param)
 	if (!ctx->z_buf || !mlx_resize_image(ctx->img, width, height))
 	{
 		fdf_free(ctx->verts, ctx->tris, ctx);
-		ft_error(mlx, "resizing failed", ctx);
+		ft_error(ctx->mlx, "resizing failed", ctx);
 	}
 	frame(ctx);
 }
