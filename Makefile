@@ -6,7 +6,7 @@
 #    By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/30 16:50:13 by myli-pen          #+#    #+#              #
-#    Updated: 2025/07/25 15:09:19 by myli-pen         ###   ########.fr        #
+#    Updated: 2025/07/29 20:43:09 by myli-pen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -59,7 +59,7 @@ $(LIBFT):
 		git clone --quiet $(URL_LIBFT) $(DIR_LIBFT); \
 	fi
 	@echo "$(GREEN) [+]$(COLOR) compiling libft.a"
-	@make -C $(DIR_LIBFT) VECTOR_SIZE=8
+	@make -C $(DIR_LIBFT)
 
 $(MLX42):
 	@if [ ! -d "$(DIR_MLX)" ]; then \
@@ -94,10 +94,7 @@ fclean: clean
 		rm -rf $(DIR_LIB); \
 		echo "$(RED) [-]$(COLOR) removed $(DIR_LIB)"; \
 	fi
-	@if [ -e "$(NAME)" ]; then \
-		rm -f $(NAME); \
-		echo "$(RED) [-]$(COLOR) removed $(NAME)"; \
-	fi
+	@rm -f $(NAME)
 
 re: fclean all
 

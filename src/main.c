@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/29 20:03:12 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/29 21:46:06 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,21 +38,22 @@ int	main(int argc, char *argv[])
 	t_context	*ctx;
 
 	if (argc != 2)
-		return (ft_error(NULL, "arguments"), EXIT_FAILURE);
+		return (ft_error(NULL, "arguments", NULL), EXIT_FAILURE);
 	mlx_set_setting(MLX_MAXIMIZED, true);
 	mlx = mlx_init(WIDTH, HEIGHT, "FdF", true);
 	if (!mlx)
-		ft_error(NULL, "mlx alloc");
+		ft_error(NULL, "mlx alloc", NULL);
 	img = mlx_new_image(mlx, mlx->width, mlx->height);
 	if (!img || mlx_image_to_window(mlx, img, 0, 0) == ERROR)
-		ft_error(mlx, "img alloc");
+		ft_error(mlx, "img alloc", NULL);
 	initialize(argv[1], &ctx, mlx, img);
 	mlx_loop_hook(mlx, loop, ctx);
 	mlx_key_hook(mlx, key_hook, ctx);
 	mlx_resize_hook(mlx, resize, ctx);
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
-	fdf_free(ctx->verts, ctx->tris, ctx, NULL);
+	fdf_free(ctx->verts, ctx->tris, ctx);
+	free(ctx);
 	return (EXIT_SUCCESS);
 }
 
@@ -102,15 +103,18 @@ static inline void	loop(void *param)
 void	resize(int width, int height, void *param)
 {
 	t_context	*ctx;
+	mlx_t		*mlx;
 
 	ctx = param;
+	mlx = ctx->mlx;
 	if (!ctx || !ctx->mlx || !ctx->img || width == 0 || height == 0)
 		return ;
 	free(ctx->z_buf);
 	ctx->z_buf = malloc(sizeof (float) * width * height);
 	if (!ctx->z_buf || !mlx_resize_image(ctx->img, width, height))
 	{
-		fdf_free(ctx->verts, ctx->tris, ctx, "resizing failed");
+		fdf_free(ctx->verts, ctx->tris, ctx);
+		ft_error(mlx, "resizing failed", ctx);
 	}
 	frame(ctx);
 }
@@ -121,7 +125,7 @@ void	resize(int width, int height, void *param)
  * @param mlx Mlx context.
  * @param message Error message.
  */
-void	ft_error(mlx_t *mlx, char *message)
+void	ft_error(mlx_t *mlx, char *message, t_context *ctx)
 {
 	ft_putstr_fd("FdF:\tError: ", STDERR_FILENO);
 	ft_putendl_fd(message, STDERR_FILENO);
@@ -131,6 +135,8 @@ void	ft_error(mlx_t *mlx, char *message)
 		perror(mlx_strerror(mlx_errno));
 		mlx_terminate(mlx);
 	}
+	if (ctx)
+		free(ctx);
 	exit(EXIT_FAILURE);
 }
 
@@ -144,11 +150,8 @@ void	ft_error(mlx_t *mlx, char *message)
  * @param ctx Rendering context containing Z-buffer.
  * @param message Error message.
  */
-void	fdf_free(t_vector *verts, t_vector *tris, t_context *ctx, char *msg)
+void	fdf_free(t_vector *verts, t_vector *tris, t_context *ctx)
 {
-	mlx_t	*mlx;
-
-	mlx = ctx->mlx;
 	if (verts)
 		vector_free(verts);
 	if (tris)
@@ -157,7 +160,4 @@ void	fdf_free(t_vector *verts, t_vector *tris, t_context *ctx, char *msg)
 	free(tris);
 	if (ctx)
 		free(ctx->z_buf);
-	free(ctx);
-	if (msg)
-		ft_error(mlx, msg);
 }
