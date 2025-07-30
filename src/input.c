@@ -6,12 +6,22 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/23 23:56:47 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/29 19:46:00 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/31 01:51:18 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
+/**
+ * Wraps the mouse horizontally across the screen boundaries.
+ *
+ * If the mouse reaches the right or left edge of the window, it is
+ * repositioned to the opposite side. The number of wraps is tracked internally.
+ *
+ * @param ctx Rendering context containing mlx context and render image.
+ * @param pos Current mouse screen position.
+ * @return The total horizontal displacement: wraps × (window width - 2)
+ */
 int	wrap_m_x(t_context *ctx, t_vec2i *pos)
 {
 	static int	wraps;
@@ -31,6 +41,16 @@ int	wrap_m_x(t_context *ctx, t_vec2i *pos)
 	return (wraps * (ctx->img->width - 2));
 }
 
+/**
+ * Wraps the mouse vertically across the screen boundaries.
+ *
+ * If the mouse reaches the top or bottom edge of the window, it is
+ * repositioned to the opposite side. The number of wraps is tracked internally.
+ *
+ * @param ctx Rendering context containing mlx context and render image.
+ * @param pos Current mouse screen position.
+ * @return The total vertical displacement: wraps × (window height - 2).
+ */
 int	wrap_m_y(t_context *ctx, t_vec2i *pos)
 {
 	static int	wraps;
@@ -122,7 +142,18 @@ void	key_hook(mlx_key_data_t keydata, void *param)
 	if (keydata.key == MLX_KEY_C && keydata.action == MLX_RELEASE)
 		ctx->color_mode = !ctx->color_mode;
 }
-
+/**
+ * Adjusts the camera's field of view (FOV) in perspective projection mode.
+ *
+ * - [U]	decrease FOV.
+ *
+ * - [I]	increase FOV.
+ *
+ * Frame-rate independent. The result is clamped between 30 degrees and
+ * 135 degrees. The camera distance is recomputed after a change.
+ *
+ * @param ctx Rendering context containing camera and mlx context.
+ */
 void	control_fov(t_context *ctx)
 {
 	if (ctx->cam.projection == PERSPECTIVE)
@@ -130,13 +161,13 @@ void	control_fov(t_context *ctx)
 		if (mlx_is_key_down(ctx->mlx, MLX_KEY_U))
 		{
 			ctx->cam.fov -= ctx->mlx->delta_time;
-			ctx->cam.fov = ft_clamp(ctx->cam.fov, 0.523599f, M_PI / 1.3f);
+			ctx->cam.fov = ft_clamp(ctx->cam.fov, M_PI / 6.0f, 3 * M_PI / 4.0f);
 			compute_distance(ctx);
 		}
 		if (mlx_is_key_down(ctx->mlx, MLX_KEY_I))
 		{
 			ctx->cam.fov += ctx->mlx->delta_time;
-			ctx->cam.fov = ft_clamp(ctx->cam.fov, 0.523599f, M_PI / 1.3f);
+			ctx->cam.fov = ft_clamp(ctx->cam.fov, M_PI / 6.0f, 3 * M_PI / 4.0f);
 			compute_distance(ctx);
 		}
 	}

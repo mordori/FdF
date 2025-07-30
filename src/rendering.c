@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:08:26 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/29 19:33:36 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/31 01:53:48 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,7 +168,7 @@ static inline void	move_pixel(
 }
 
 /**
- * Stores a pixel in the framebuffer if it is within the render image
+ * Stores a pixel in the framebuffer if it's within the render image
  * boundaries. The framebuffer uses 32-bit ABGR colors.
  *
  * @param ctx Rendering context containing render image and Z-buffer.

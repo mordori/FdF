@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 02:40:17 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/29 19:32:31 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/31 00:41:48 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,14 @@
 static inline bool	clip_test(float p, float q, float *t0, float *t1);
 
 /**
- * Performs Liang-Barsky clipping in homogeneous clip space (3D).
- * The function clips geometry outside the camera’s viewing frustum
- * defined by near, far, left, right, top, and bottom planes (-w <= x,y,z <= w).
+ * Performs Liang-Barsky clipping in homogeneous clip space.
+ * Clips geometry outside the camera’s viewing frustum
+ * defined by near, far, left, right, top, and bottom planes
+ * (-w <= x,y,z <= w).
  *
  * If the line segment lies partially outside the view volume, the function
- * modifies `v0` and/or `v1` to clip them. Colors are interpolated at clipped
- * points for smooth shading.
+ * modifies `v0` and/or `v1` to clip them. Colors are also interpolated at
+ * clipped points.
  *
  * @param v0 First vertex of the line.
  * @param v1 Second vertex of the line.
@@ -55,9 +56,9 @@ bool	liang_barsky_clip(t_vertex *v0, t_vertex *v1)
 }
 
 /**
- * Clips a line segment against the screen boundaries.
- * This is a 2D variant of the Liang-Barsky algorithm. It operates on a
- * rectangle defined by the screen's pixel boundaries (0, width/height).
+ * 2D variant of the Liang-Barsky algorithm that clips a line segment
+ * against the screen boundaries. Operates on a rectangle defined by
+ * the screen's boundaries (0, width/height).
  *
  * @param ctx Render context containing screen dimensions.
  * @param v0 First vertex of the line.
@@ -91,8 +92,8 @@ bool	liang_barsky_screen(t_context *ctx, t_vertex *v0, t_vertex *v1)
 
 /**
  * Determines whether a segment lies within the clipping bounds for a single
- * boundary. Adjusts the `t0` and `t1` parameters, which represent the
- * parametric range of the visible segment (0 <= t <= 1).
+ * boundary. Adjusts the `t0` and `t1` interpolation parameters,
+ * which represent the range of the visible line segment (0 <= t <= 1).
  *
  * @param p Directional component of the line relative to the clipping boundary.
  * @param q Distance from the line's starting point to the clipping boundary.

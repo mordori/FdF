@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:09:05 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/29 21:14:17 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/31 00:46:48 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,17 +43,6 @@ void	clear_image(t_context *ctx, uint32_t color)
 		ft_memcpy(&ctx->z_buf[i * width], ctx->z_buf, width * sizeof (float));
 		++i;
 	}
-}
-
-uint32_t	rgba_to_abgr(uint32_t rgba)
-{
-	t_color	abgr;
-
-	abgr.a = (rgba & 0xFF) << 24;
-	abgr.b = (rgba & 0xFF00) << 8;
-	abgr.g = (rgba & 0xFF0000) >> 8;
-	abgr.r = (rgba & 0xFF000000) >> 24;
-	return (abgr.a | abgr.b | abgr.g | abgr.r);
 }
 
 /**

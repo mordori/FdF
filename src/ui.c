@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 01:10:00 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/30 22:35:09 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/31 01:54:15 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,11 @@ ft_error(ctx->mlx, "ui 2", ctx);
 	}
 }
 
+/**
+ * Updates additional UI control hints.
+ *
+ * @param ctx Render context containing camera and mlx context.
+ */
 static inline void	update_ui_3(t_context *ctx)
 {
 	static mlx_image_t	*info;
