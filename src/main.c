@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/29 21:54:09 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/30 22:32:30 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int	main(int argc, char *argv[])
 	t_context	*ctx;
 
 	if (argc != 2)
-		return (ft_error(NULL, "arguments", NULL), EXIT_FAILURE);
+		ft_error(NULL, "arguments", NULL);
 	mlx_set_setting(MLX_MAXIMIZED, true);
 	mlx = mlx_init(WIDTH, HEIGHT, "FdF", true);
 	if (!mlx)

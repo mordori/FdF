@@ -6,14 +6,13 @@
 #    By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/30 16:50:13 by myli-pen          #+#    #+#              #
-#    Updated: 2025/07/29 22:04:49 by myli-pen         ###   ########.fr        #
+#    Updated: 2025/07/30 22:47:10 by myli-pen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 MAKEFLAGS	+= --no-print-directory
 NAME		=fdf
 
-URL_LIBFT	=https://github.com/mordori/libft.git
 URL_MLX		=https://github.com/codam-coding-college/MLX42.git
 
 LIBFT		=$(DIR_LIBFT)libft.a
@@ -26,14 +25,14 @@ VECTOR_SIZE	=1024
 
 DIR_LIBFT	=$(DIR_LIB)libft/
 DIR_MLX		=$(DIR_LIB)MLX42/
-DIR_INC		=include/
+DIR_INC		=inc/
 DIR_SRC		=src/
 DIR_OBJ		=obj/
 DIR_LIB		=lib/
 DIR_DEP		=dep/
 
 HEADERS		=$(addprefix -I , \
-				$(DIR_INC) $(DIR_LIBFT)$(DIR_INC) $(DIR_MLX)$(DIR_INC)MLX42/)
+				$(DIR_INC) $(DIR_LIBFT)$(DIR_INC) $(DIR_MLX)include/MLX42/)
 SRCS		=$(addprefix $(DIR_SRC), \
 				main.c mesh.c parsing.c projection.c rendering.c \
 				colors.c camera.c model.c camera_controls.c ui.c \
@@ -54,10 +53,6 @@ $(DIR_OBJ):
 	@echo "$(GREEN) [+]$(COLOR) created missing directories"
 
 $(LIBFT):
-	@if [ ! -d "$(DIR_LIBFT)" ]; then \
-		echo "$(BLUE) [~]$(COLOR) cloning to lib/ $(BLUE)$(URL_LIBFT)$(COLOR)"; \
-		git clone --quiet $(URL_LIBFT) $(DIR_LIBFT); \
-	fi
 	@echo "$(GREEN) [+]$(COLOR) compiling libft.a"
 	@make -C $(DIR_LIBFT)
 
@@ -85,15 +80,14 @@ clean:
 		echo "$(RED) [-]$(COLOR) removed $(DIR_OBJ)"; \
 		echo "$(RED) [-]$(COLOR) removed $(DIR_DEP)"; \
 	fi
-	@if [ -d "$(DIR_LIBFT)" ]; then \
-		make -C $(DIR_LIBFT) clean; \
-	fi
+	@make -C $(DIR_LIBFT) clean
 
 fclean: clean
-	@if [ -d "$(DIR_LIB)" ]; then \
-		rm -rf $(DIR_LIB); \
-		echo "$(RED) [-]$(COLOR) removed $(DIR_LIB)"; \
+	@if [ -d "$(DIR_MLX)" ]; then \
+		rm -rf $(DIR_MLX); \
+		echo "$(RED) [-]$(COLOR) removed $(DIR_MLX)"; \
 	fi
+	@make -C $(DIR_LIBFT) fclean
 	@if [ -e "$(NAME)" ]; then \
 		rm -f $(NAME); \
 		echo "$(RED) [-]$(COLOR) removed $(NAME)"; \

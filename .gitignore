@@ -2,7 +2,7 @@
 .vscode/
 dep/
 obj/
-lib/
+lib/MLX42
 *.o
 *.d
 a.out

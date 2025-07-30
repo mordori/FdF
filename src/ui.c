@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 01:10:00 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/29 21:45:19 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/07/30 22:35:09 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,8 @@ static inline void	update_ui_1(t_context *ctx)
 	else if (ctx->cam.projection == PERSPECTIVE)
 		proj = mlx_put_string(ctx->mlx, "Perspective", 100, 60);
 	if (!proj)
-		return (fdf_free(ctx->verts, ctx->tris, ctx), \
-ft_error(ctx->mlx, "ui 1", ctx));
+		fdf_free(ctx->verts, ctx->tris, ctx), \
+ft_error(ctx->mlx, "ui 1", ctx);
 }
 
 /**
@@ -67,8 +67,8 @@ static inline void	update_ui_2(t_context *ctx)
 		y = ft_imax(100, ctx->img->height - 110);
 		controls = mlx_put_string(ctx->mlx, str, 100, y);
 		if (!controls)
-			return (fdf_free(ctx->verts, ctx->tris, ctx), \
-ft_error(ctx->mlx, "ui 2", ctx));
+			fdf_free(ctx->verts, ctx->tris, ctx), \
+ft_error(ctx->mlx, "ui 2", ctx);
 		controls->instances[0].z = 101;
 	}
 }
@@ -90,8 +90,8 @@ static inline void	update_ui_3(t_context *ctx)
 	info = mlx_put_string(ctx->mlx, str_i, 100,
 			ft_imax(100, ctx->img->height - 75));
 	if (!info)
-		return (fdf_free(ctx->verts, ctx->tris, ctx), \
-ft_error(ctx->mlx, "ui 3-1", ctx));
+		fdf_free(ctx->verts, ctx->tris, ctx), \
+ft_error(ctx->mlx, "ui 3-1", ctx);
 	info->instances[0].z = 102;
 	if (ctx->cam.projection == ISOMETRIC)
 		return ;
@@ -99,7 +99,7 @@ ft_error(ctx->mlx, "ui 3-1", ctx));
 	controls = mlx_put_string(ctx->mlx, str_c, 100,
 			ft_imax(100, ctx->img->height - 145));
 	if (!controls)
-		return (fdf_free(ctx->verts, ctx->tris, ctx), \
-ft_error(ctx->mlx, "ui 3-2", ctx));
+		fdf_free(ctx->verts, ctx->tris, ctx), \
+ft_error(ctx->mlx, "ui 3-2", ctx);
 	controls->instances[0].z = 103;
 }
