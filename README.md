@@ -6,6 +6,10 @@ Simple wireframe model software renderer with limited file parsing.
 - Follows an OpenGL-style right-handed coordinate convention, where Y is up, X is to the right, and in view space the camera looks down -Z.
 - Includes an orbiting camera controller that emulates the navigation style of 3D modeling software like Blender.
 
+<p align="center">
+  <img src="doc/42.gif" alt="Demo" />
+</p>
+
 ## 📖 Introduction
 
 This is my favorite project from the 42 curriculum so far. I'm very excited to learn more about graphics programming, and I took extra time to complete this project. I had two clear goals in mind:
@@ -39,7 +43,7 @@ Possible further improvements:
 
 > [!IMPORTANT]
 > [MLX42](https://github.com/codam-coding-college/MLX42), a minimal graphics library, is used in this project. It handles window creation and manages the framebuffer.
-> 
+>
 > The `Makefile` will download and build MLX42 for use in the program, but it requires certain dependencies to be installed, depending on your system. Please refer to their [installation documentation](https://github.com/codam-coding-college/MLX42?tab=readme-ov-file#for-linux) for more information.
 >
 > - (Optional) The project files include `mlx42.supp`, a suppression file to be used with valgrind. It will ignore the memory leaks originating from MLX42.
