@@ -50,13 +50,9 @@ Possible further improvements:
 
 > [!TIP]
 > ## 🚀 How to use
-- Clone the repository
+- Run the following command to clone the repository and create `fdf` program
 ``` git
-git clone https://github.com/mordori/fdf.git fdf && cd fdf
-```
-- Run the following command to create `fdf`
-``` Makefile
-make
+git clone https://github.com/mordori/fdf.git fdf && cd fdf && make
 ```
 - Execute the program with a map file as a parameter, for example
 ``` C
