@@ -45,7 +45,7 @@ make
 ``` C
 ./fdf maps/test.fdf
 ```
-- To delete all of the compiled files, use
+- To delete all of the compiled files and MLX42, use
 ``` Makefile
 make fclean
 ```
