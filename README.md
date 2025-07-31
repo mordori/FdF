@@ -29,7 +29,7 @@ For the bonus portion, several additional features were required:
 > 
 > The `Makefile` will download and build MLX42 for use in the program, but it requires certain dependencies to be installed, depending on your system. Please refer to their [installation documentation](https://github.com/codam-coding-college/MLX42?tab=readme-ov-file#for-linux) for more information.
 >
-> - (Optional) The project files include `mlx42.supp` suppression file to be used with valgrind. It will ignore the memory leaks from MLX42.
+> - (Optional) The project files include `mlx42.supp` suppression file to be used with valgrind. It will ignore the memory leaks originating from MLX42.
 
 > [!TIP]
 > ## 🚀 How to use
