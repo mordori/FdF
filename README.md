@@ -1,4 +1,4 @@
-# FdF
+# FdF (Fil de Fer)
 ## ✨ Features
 Simple wireframe model software renderer with limited file parsing.
 - Implements a software-based geometry pipeline similar to that of modern GPUs.
