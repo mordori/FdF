@@ -60,3 +60,19 @@ make fclean
 
 > [!TIP]
 > ## 🎮 Controls
+> Isometric view is locked. To enable controls, switch to other view/projection using `P`.
+
+| Input               | Description                     |
+|---------------------|---------------------------------|
+| `P`                  | Switch view/projection (isometric -> orthographic -> perspective)        |
+| `Left Mouse Button`    | Orbit camera   |
+| `Middle Mouse Button`  | Pan camera   |
+| `Right Mouse Button`   | Zoom camera in/out              |
+| `W`, `A`, `S`, `D`   | Traslate object in X and Z axis |
+| `Arrow Keys`         | Rotate object around X and Z axis  |
+| `R`                  | Reset object and camera         |
+| `F`                  | Frame model to fit window        |
+| `C`                  | Toggle additional rainbow color mode       |
+| `SPACE`              | Toggle additional spinning mode        |
+| `U`, `I`             | Decrease/increase camera FOV in perspective projection        |
+| `Esc`                | Exit program                     |
