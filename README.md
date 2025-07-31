@@ -24,6 +24,14 @@ For the bonus portion, several additional features were required:
 - Zooming
 - One extra feature chosen by the programmer
 
+At first, I didn’t implement proper clipping. I simply rejected a line segment entirely if either of its vertices were behind the camera in view space, to avoid division by zero during the perspective divide. However, after failing my first evaluation due to not closing a file descriptor on all error paths, I was given time to fix the issue and decided to improve other aspects of the project as well.
+
+I attempted to implement the Cohen–Sutherland clipping algorithm in clip space, but quickly realized it’s not suitable for use with homogeneous coordinates. The algorithm got stuck in an infinite loop because it doesn't handle the w component or the 3D view frustum correctly. I switched to Liang–Barsky, which is not only more intuitive but also directly considers the w component, making it much more appropriate for 3D clipping in clip space. I also wrote a screen-space variant as a safeguard.
+
+One interesting problem I encountered was an optical illusion, especially visible when using orthographic projection: at certain camera angles, the model appeared to flip direction. I spent hours debugging, convinced I had a sign error or an incorrect matrix element in my view or projection matrix. Only after discussing it with a couple of peers and being shown the famous spinning ballerina illusion, which can appear to spin clockwise or counterclockwise depending on the viewer, I understood that the illusion was in my perception.
+
+To confirm that everything was working correctly, I implemented depth testing. Seeing correct pixel overwrites (where nearer geometry occluded farther geometry) gave me confidence that the model was being rendered and rotated properly, even if my brain occasionally failed to interpret its orientation.
+
 > [!IMPORTANT]
 > [MLX42](https://github.com/codam-coding-college/MLX42), a minimal graphics library, is used in this project. It handles window creation and manages the framebuffer.
 > 
