@@ -32,6 +32,11 @@ One interesting problem I encountered was an optical illusion, especially visibl
 
 To confirm that everything was working correctly, I implemented depth testing. Seeing correct pixel overwrites (where nearer geometry occluded farther geometry) gave me confidence that the model was being rendered and rotated properly, even if my brain occasionally failed to interpret its orientation.
 
+Possible further improvements:
+- Store line segments in a dedicated container for rendering to avoid duplicates (currently, for tringles in the last row or last column, edges are drawn for both triangles to ensure the boundary lines are rendered)
+- Switch to quaternions for more consistent and stable rotations
+- Refine panning behavior for better consistency across different projection modes
+
 > [!IMPORTANT]
 > [MLX42](https://github.com/codam-coding-college/MLX42), a minimal graphics library, is used in this project. It handles window creation and manages the framebuffer.
 > 
