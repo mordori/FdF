@@ -1,10 +1,10 @@
 # FdF (Fil de Fer)
 ## ✨ Features
 Simple wireframe model software renderer with limited file parsing.
-- Implements a software-based geometry pipeline similar to that of modern GPUs.
-- Uses the Liang-Barsky algorithm for line clipping and Bresenham’s algorithm for rasterizing the lines.
-- Follows an OpenGL-style right-handed coordinate convention, where Y is up, X is to the right, and in view space the camera looks down -Z.
-- Includes an orbiting camera controller that emulates the navigation style of 3D modeling software like Blender.
+- Implements a software-based geometry pipeline similar to that of modern GPUs
+- Uses the Liang-Barsky algorithm for line clipping and Bresenham’s algorithm for rasterizing the lines
+- Follows an OpenGL-style right-handed coordinate convention, where Y is up, X is to the right, and in view space the camera looks down -Z
+- Includes an orbiting camera controller that emulates the navigation style of 3D modeling software like Blender
 
 <p align="center">
   <img src="doc/42.gif" alt="Demo" />
@@ -14,8 +14,8 @@ Simple wireframe model software renderer with limited file parsing.
 
 This is my favorite project from the 42 curriculum so far. I'm very excited to learn more about graphics programming, and I took extra time to complete this project. I had two clear goals in mind:
 
-- To study the geometry processing pipeline of GPUs and build something that resembles it.
-- To implement a smooth orbiting camera controller, similar to the one used in Blender.
+- To study the geometry processing pipeline of GPUs and build something that resembles it
+- To implement a smooth orbiting camera controller, similar to the one used in Blender
 
 This meant I also had to brush up on my knowledge of matrices and linear algebra. While we were allowed to use functions from `math.h`, I had to implement a number of additional utilities to support the program including matrix operations, 3D vector structures (vecs), and dynamically sized arrays (vectors).
 
@@ -75,7 +75,7 @@ make fclean
 | `Right Mouse Button`	| Zoom camera in/out												|
 | `W`, `A`, `S`, `D`	| Traslate object in X and Z axes									|
 | `Arrow Keys`			| Rotate object around X and Z axes									|
-| `R`					| Reset object and camera											|
+| `R`					| Reset object and camera	transforms 										|
 | `F`					| Frame model to fit window											|
 | `C`					| Toggle rainbow color mode											|
 | `SPACE`				| Toggle spinning mode												|
