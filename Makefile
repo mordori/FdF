@@ -6,11 +6,10 @@
 #    By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/30 16:50:13 by myli-pen          #+#    #+#              #
-#    Updated: 2025/08/05 01:06:25 by myli-pen         ###   ########.fr        #
+#    Updated: 2025/08/05 01:26:53 by myli-pen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-MAKEFLAGS	+= --no-print-directory
 NAME		=fdf
 
 URL_MLX		=https://github.com/codam-coding-college/MLX42.git
@@ -18,10 +17,12 @@ URL_MLX		=https://github.com/codam-coding-college/MLX42.git
 LIBFT		=$(DIR_LIBFT)libft.a
 MLX42		=$(DIR_MLX)build/libmlx42.a
 
+VECTOR_SIZE	=1024
+
 CC			=cc
 CFLAGS		=-Wall -Wextra -Werror -Wunreachable-code -O3
 LDFLAGS		=-ldl -lglfw -pthread -lm
-VECTOR_SIZE	=1024
+MAKEFLAGS	+= --no-print-directory
 
 DIR_LIBFT	=$(DIR_LIB)libft/
 DIR_MLX		=$(DIR_LIB)MLX42/
