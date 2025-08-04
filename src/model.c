@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:51 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/30 22:34:10 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/08/05 00:52:10 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,23 +37,20 @@ void	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
 		ft_error(mlx, "verts alloc", NULL);
 	tris = malloc(sizeof (t_vector));
 	if (!tris)
-		free(verts), ft_error(mlx, "tris alloc", NULL);
+		(free(verts), ft_error(mlx, "tris alloc", NULL));
 	if (!vector_init(verts, true))
-		fdf_free(verts, NULL, NULL), free(tris), \
-ft_error(mlx, "verts init", NULL);
+		(fdf_free(verts, NULL, NULL), free(tris), \
+ft_error(mlx, "verts init", NULL));
 	if (parse_map(file, verts, &rows_cols) == ERROR || rows_cols.x < 2)
-		fdf_free(verts, NULL, NULL), free(tris), \
-ft_error(mlx, "parse map", NULL);
+		(fdf_free(verts, NULL, NULL), free(tris), \
+ft_error(mlx, "parse map", NULL));
 	if (!vector_init(tris, true))
-		fdf_free(verts, tris, NULL), \
-ft_error(mlx, "tris init", NULL);
+		(fdf_free(verts, tris, NULL), ft_error(mlx, "tris init", NULL));
 	if (!make_triangles(tris, rows_cols))
-		fdf_free(verts, tris, NULL), \
-ft_error(mlx, "make triangles", NULL);
+		(fdf_free(verts, tris, NULL), ft_error(mlx, "make triangles", NULL));
 	*ctx = malloc(sizeof (t_context));
 	if (!*ctx)
-		fdf_free(verts, tris, NULL), \
-ft_error(mlx, "ctx alloc", NULL);
+		(fdf_free(verts, tris, NULL), ft_error(mlx, "ctx alloc", NULL));
 	(*ctx)->verts = verts;
 	(*ctx)->tris = tris;
 	(*ctx)->rows_cols = rows_cols;
@@ -124,7 +121,8 @@ static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img)
 
 	ctx->z_buf = malloc(sizeof(float) * img->width * img->height);
 	if (!ctx->z_buf)
-		fdf_free(ctx->verts, ctx->tris, ctx), ft_error(mlx, "z-buf alloc", ctx);
+		(fdf_free(ctx->verts, ctx->tris, ctx), \
+ft_error(mlx, "z-buf alloc", ctx));
 	while (i < img->width * img->height)
 		ctx->z_buf[i++] = INFINITY;
 	ctx->mlx = mlx;
