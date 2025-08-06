@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 17:19:35 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/30 22:32:30 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/08/06 21:58:07 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ void	resize(int width, int height, void *param)
 	if (!ctx || !ctx->mlx || !ctx->img || width == 0 || height == 0)
 		return ;
 	free(ctx->z_buf);
-	ctx->z_buf = malloc(sizeof (float) * width * height);
+	ctx->z_buf = malloc(sizeof(float) * width * height);
 	if (!ctx->z_buf || !mlx_resize_image(ctx->img, width, height))
 	{
 		fdf_free(ctx->verts, ctx->tris, ctx);
@@ -133,8 +133,7 @@ void	ft_error(mlx_t *mlx, char *message, t_context *ctx)
 		perror(mlx_strerror(mlx_errno));
 		mlx_terminate(mlx);
 	}
-	if (ctx)
-		free(ctx);
+	free(ctx);
 	exit(EXIT_FAILURE);
 }
 
@@ -150,12 +149,6 @@ void	ft_error(mlx_t *mlx, char *message, t_context *ctx)
  */
 void	fdf_free(t_vector *verts, t_vector *tris, t_context *ctx)
 {
-	if (verts)
-		vector_free(verts);
-	if (tris)
-		vector_free(tris);
-	free(verts);
-	free(tris);
-	if (ctx)
-		free(ctx->z_buf);
+	vector_free(verts, tris, NULL);
+	free(ctx->z_buf);
 }

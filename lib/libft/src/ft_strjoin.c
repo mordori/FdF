@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/27 20:08:44 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/02 15:59:59 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/08/06 20:42:28 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 		return (NULL);
 	len1 = ft_strlen(s1);
 	len2 = ft_strlen(s2);
-	str = malloc((len1 + len2 + 1) * sizeof (char));
+	str = malloc((len1 + len2 + 1) * sizeof(char));
 	if (!str)
 		return (NULL);
 	ft_memcpy(str, s1, len1);
@@ -59,7 +59,7 @@ char	*ft_strjoin_free(char *s1, char *s2)
 		return (NULL);
 	len1 = ft_strlen(s1);
 	len2 = ft_strlen(s2);
-	str = malloc((len1 + len2 + 1) * sizeof (char));
+	str = malloc((len1 + len2 + 1) * sizeof(char));
 	if (str)
 	{
 		ft_memcpy(str, s1, len1);

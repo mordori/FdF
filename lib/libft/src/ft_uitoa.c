@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 17:19:31 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/02 16:08:17 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/08/06 20:42:08 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ char	*ft_uitoa(uintptr_t n, const char *base)
 		return (NULL);
 	len = ft_strlen(base);
 	digits = ft_ucountdigits(n, len);
-	str = malloc((digits + 1) * sizeof (char));
+	str = malloc((digits + 1) * sizeof(char));
 	if (!str)
 		return (NULL);
 	str[digits] = '\0';

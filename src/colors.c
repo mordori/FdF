@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:09:05 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/31 00:46:48 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/08/06 20:41:55 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ void	clear_image(t_context *ctx, uint32_t color)
 	i = 1;
 	while (i < height)
 	{
-		ft_memcpy(&pixels[i * width], pixels, width * sizeof (uint32_t));
-		ft_memcpy(&ctx->z_buf[i * width], ctx->z_buf, width * sizeof (float));
+		ft_memcpy(&pixels[i * width], pixels, width * sizeof(uint32_t));
+		ft_memcpy(&ctx->z_buf[i * width], ctx->z_buf, width * sizeof(float));
 		++i;
 	}
 }

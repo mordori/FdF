@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 16:13:36 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/24 22:08:56 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/08/06 21:07:16 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static inline bool	vector_resize(t_vector *vec, size_t size)
 	void	**items;
 	size_t	i;
 
-	items = malloc(sizeof (void *) * size);
+	items = malloc(sizeof(void *) * size);
 	if (!items)
 		return (false);
 	i = 0;
@@ -102,25 +102,31 @@ vec->total == vec->size / 4)
  * @param vec Vector to be operated.
  * @return True if successful, else false.
  */
-bool	vector_free(t_vector *vec)
+bool	vector_free(t_vector *vec, ...)
 {
 	size_t	i;
+	va_list	params;
 
-	if (!vec || !vec->size)
-		return (false);
-	i = 0;
-	if (vec->total && vec->is_heap)
+	va_start(params, vec);
+	while (vec)
 	{
-		while (i < vec->total)
+		if (vec->size)
 		{
-			free(vec->items[i]);
-			vec->items[i++] = NULL;
+			i = 0;
+			if (vec->total && vec->is_heap)
+			{
+				while (i < vec->total)
+					free(vec->items[i++]);
+			}
+			vec->total = 0;
+			vec->size = 0;
+			free(vec->items);
+			vec->items = NULL;
 		}
+		free(vec);
+		vec = va_arg(params, t_vector *);
 	}
-	free(vec->items);
-	vec->total = 0;
-	vec->size = 0;
-	vec->items = NULL;
+	va_end(params);
 	return (true);
 }
 

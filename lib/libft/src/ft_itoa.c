@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 14:42:36 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/02 16:04:20 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/08/06 22:01:10 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,28 +27,29 @@
  */
 char	*ft_itoa(int n, const char *base)
 {
-	char	*str;
-	int		sign;
-	size_t	digits;
-	size_t	len;
+	char		*str;
+	size_t		digits;
+	size_t		base_len;
+	long long	num;
 
 	if (!ft_strchrdup(base))
 		return (NULL);
-	len = ft_strlen(base);
-	sign = 1;
+	base_len = ft_strlen(base);
+	num = n;
 	if (n < 0)
-		sign = -1;
-	digits = ft_countdigits(n, len) + (sign == -1);
-	str = malloc((digits + 1) * sizeof (char));
+		num = -num;
+	digits = ft_countdigits(num, base_len) + (n < 0);
+	str = malloc(digits + 1);
 	if (!str)
 		return (NULL);
 	str[digits] = '\0';
 	while (digits--)
 	{
-		str[digits] = base[(n * sign) % len];
-		n /= len;
+		str[digits] = base[num % base_len];
+		num /= base_len;
 	}
-	if (sign == -1)
+	if ((n < 0))
 		str[0] = '-';
 	return (str);
 }
+

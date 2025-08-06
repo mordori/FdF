@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:14:56 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 19:46:57 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/08/06 20:41:44 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ t_vertex	*make_vert(float x, float y, float z, uint32_t color)
 {
 	t_vertex	*v;
 
-	v = malloc(sizeof (t_vertex));
+	v = malloc(sizeof(t_vertex));
 	if (!v)
 		return (NULL);
 	v->pos = vec4(x, -y, z, 1.0f);
@@ -86,7 +86,7 @@ t_vec3	*make_tri(int x, int y, int z)
 {
 	t_vec3	*vec;
 
-	vec = malloc(sizeof (t_vec3));
+	vec = malloc(sizeof(t_vec3));
 	if (!vec)
 		return (NULL);
 	*vec = vec3(x, y, z);

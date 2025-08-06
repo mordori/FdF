@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/26 21:26:33 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/02 16:00:10 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/08/06 20:42:10 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	if (ft_strlen(s) > start)
 		while (s[start + i] && i < len)
 			++i;
-	sub = malloc((i + 1) * sizeof (char));
+	sub = malloc((i + 1) * sizeof(char));
 	if (sub)
 	{
 		ft_memcpy(sub, &s[start], i);

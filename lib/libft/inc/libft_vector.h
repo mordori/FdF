@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 14:30:08 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/23 19:59:47 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/08/06 21:07:53 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define LIBFT_VECTOR_H
 
 # include <stdlib.h>
+# include <stdarg.h>
 
 # include "libft_defs.h"
 
@@ -26,7 +27,7 @@ typedef struct s_vector
 }				t_vector;
 
 bool	vector_add(t_vector *vec, void *new);
-bool	vector_free(t_vector *vec);
+bool	vector_free(t_vector *vec, ...);
 bool	vector_del(t_vector *vec, size_t index);
 void	*vector_get(t_vector *vec, size_t index);
 bool	vector_init(t_vector *vec, bool is_heap);
