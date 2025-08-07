@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:51 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/08/06 21:51:34 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/08/07 22:27:12 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img);
 static inline void	normalize_model(t_context *ctx);
+static inline void	alloc_verts_tris_ctx(t_vector **verts, t_vector **tris,
+						t_context **ctx, mlx_t *mlx);
 
 /**
  * Parses the map file, initializes the vertex and triangle vectors,
@@ -32,7 +34,7 @@ void	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
 	t_vector	*tris;
 	t_vec2i		rows_cols;
 
-	alloc_verts_tris_ctx(verts, tris, *ctx);
+	alloc_verts_tris_ctx(&verts, &tris, ctx, mlx);
 	if (!vector_init(verts, true) ||
 		parse_map(file, verts, &rows_cols) == ERROR || rows_cols.x < 2)
 	{
@@ -51,16 +53,16 @@ void	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
 	init_context(*ctx, mlx, img);
 }
 
-static inline void	alloc_verts_tris_ctx(
-						t_vector *verts, t_vector *verts, t_context *ctx)
+static inline void	alloc_verts_tris_ctx(t_vector **verts, t_vector **tris,
+						t_context **ctx, mlx_t *mlx)
 {
-	verts = malloc(sizeof(t_vector));
-	tris = malloc(sizeof(t_vector));
-	ctx = malloc(sizeof(t_context));
-	if (!verts || !tris || !ctx)
+	*verts = malloc(sizeof(t_vector));
+	*tris = malloc(sizeof(t_vector));
+	*ctx = malloc(sizeof(t_context));
+	if (!*verts || !*tris || !*ctx)
 	{
-		free(verts);
-		free(tris);
+		free(*verts);
+		free(*tris);
 		ft_error(mlx, "verts/tris/ctx alloc", NULL);
 	}
 }
