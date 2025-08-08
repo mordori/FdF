@@ -6,15 +6,15 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:51 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/08/07 22:27:12 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/08/09 01:54:04 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
 
-static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img);
+static inline void	init_context(t_context *ctx);
 static inline void	normalize_model(t_context *ctx);
-static inline void	alloc_verts_tris_ctx(t_vector **verts, t_vector **tris,
+static inline void	alloc_model(t_vector **verts, t_vector **tris,
 						t_context **ctx, mlx_t *mlx);
 
 /**
@@ -34,26 +34,30 @@ void	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
 	t_vector	*tris;
 	t_vec2i		rows_cols;
 
-	alloc_verts_tris_ctx(&verts, &tris, ctx, mlx);
+	alloc_model(&verts, &tris, ctx, mlx);
 	if (!vector_init(verts, true) ||
 		parse_map(file, verts, &rows_cols) == ERROR || rows_cols.x < 2)
 	{
 		free(tris);
 		vector_free(verts, NULL);
+		free((*ctx)->z_buf);
 		ft_error(mlx, "verts init || parse map", NULL);
 	}
 	if (!vector_init(tris, true) || !make_triangles(tris, rows_cols))
 	{
 		vector_free(verts, tris, NULL);
+		free((*ctx)->z_buf);
 		ft_error(mlx, "tris init/make", NULL);
 	}
 	(*ctx)->verts = verts;
 	(*ctx)->tris = tris;
 	(*ctx)->rows_cols = rows_cols;
-	init_context(*ctx, mlx, img);
+	(*ctx)->mlx = mlx;
+	(*ctx)->img = img;
+	init_context(*ctx);
 }
 
-static inline void	alloc_verts_tris_ctx(t_vector **verts, t_vector **tris,
+static inline void	alloc_model(t_vector **verts, t_vector **tris,
 						t_context **ctx, mlx_t *mlx)
 {
 	*verts = malloc(sizeof(t_vector));
@@ -64,6 +68,13 @@ static inline void	alloc_verts_tris_ctx(t_vector **verts, t_vector **tris,
 		free(*verts);
 		free(*tris);
 		ft_error(mlx, "verts/tris/ctx alloc", NULL);
+	}
+	(*ctx)->z_buf = malloc(sizeof(float) * mlx->width * mlx->height);
+	if (!(*ctx)->z_buf)
+	{
+		free(*verts);
+		free(*tris);
+		ft_error(mlx, "z-buf alloc", *ctx);
 	}
 }
 
@@ -124,21 +135,13 @@ void	compute_bounds(t_context *ctx, t_space space, size_t i, t_vertex *v)
  * @param mlx Mlx context.
  * @param img Render image.
  */
-static inline void	init_context(t_context *ctx, mlx_t *mlx, mlx_image_t *img)
+static inline void	init_context(t_context *ctx)
 {
 	static size_t	i;
 	t_vertex		v;
 
-	ctx->z_buf = malloc(sizeof(float) * img->width * img->height);
-	if (!ctx->z_buf)
-	{
-		vector_free(ctx->verts, ctx->tris, NULL);
-		ft_error(mlx, "z-buf alloc", ctx);
-	}
-	while (i < img->width * img->height)
+	while (i < ctx->img->width * ctx->img->height)
 		ctx->z_buf[i++] = INFINITY;
-	ctx->mlx = mlx;
-	ctx->img = img;
 	ctx->transform.pos = vec3_n(0.0f);
 	ctx->transform.rot = vec3_n(0.0f);
 	ctx->transform.scale = vec3_n(1.0f);

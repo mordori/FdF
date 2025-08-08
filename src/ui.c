@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 01:10:00 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/08/05 00:53:45 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/08/09 01:58:19 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,14 @@
 static inline void	update_ui_1(t_context *ctx);
 static inline void	update_ui_2(t_context *ctx);
 static inline void	update_ui_3(t_context *ctx);
+static inline void	update_ui_4(t_context *ctx);
 
 void	update_ui(t_context *ctx)
 {
 	update_ui_1(ctx);
 	update_ui_2(ctx);
 	update_ui_3(ctx);
+	update_ui_4(ctx);
 }
 
 /**
@@ -41,8 +43,10 @@ static inline void	update_ui_1(t_context *ctx)
 	else if (ctx->cam.projection == PERSPECTIVE)
 		proj = mlx_put_string(ctx->mlx, "Perspective", 100, 60);
 	if (!proj)
-		(fdf_free(ctx->verts, ctx->tris, ctx), \
-ft_error(ctx->mlx, "ui 1", ctx));
+	{
+		fdf_free(ctx->verts, ctx->tris, ctx);
+		ft_error(ctx->mlx, "ui 1", ctx);
+	}
 }
 
 /**
@@ -67,8 +71,10 @@ static inline void	update_ui_2(t_context *ctx)
 		y = ft_imax(100, ctx->img->height - 110);
 		controls = mlx_put_string(ctx->mlx, str, 100, y);
 		if (!controls)
-			(fdf_free(ctx->verts, ctx->tris, ctx), \
-ft_error(ctx->mlx, "ui 2", ctx));
+		{
+		fdf_free(ctx->verts, ctx->tris, ctx);
+		ft_error(ctx->mlx, "ui 2", ctx);
+		}
 		controls->instances[0].z = 101;
 	}
 }
@@ -81,30 +87,44 @@ ft_error(ctx->mlx, "ui 2", ctx));
 static inline void	update_ui_3(t_context *ctx)
 {
 	static mlx_image_t	*info;
-	static mlx_image_t	*controls;
 	char				*str_i;
-	char				*str_c;
 
 	if (info)
 		mlx_delete_image(ctx->mlx, info);
-	if (controls)
-		mlx_delete_image(ctx->mlx, controls);
 	str_i = "[ESC]quit  [P]projection [C]color  [R]reset";
 	if (ctx->cam.projection == ISOMETRIC)
 		str_i = "[ESC]quit  [P]projection";
 	info = mlx_put_string(ctx->mlx, str_i, 100,
 			ft_imax(100, ctx->img->height - 75));
 	if (!info)
-		(fdf_free(ctx->verts, ctx->tris, ctx), \
-ft_error(ctx->mlx, "ui 3-1", ctx));
+	{
+		fdf_free(ctx->verts, ctx->tris, ctx);
+		ft_error(ctx->mlx, "ui 3-1", ctx);
+	}
 	info->instances[0].z = 102;
+}
+
+/**
+ * Updates additional UI control hints.
+ *
+ * @param ctx Render context containing camera and mlx context.
+ */
+static inline void	update_ui_4(t_context *ctx)
+{
+	static mlx_image_t	*controls;
+	char				*str_c;
+
+	if (controls)
+		mlx_delete_image(ctx->mlx, controls);
 	if (ctx->cam.projection == ISOMETRIC)
 		return ;
 	str_c = "[MMB]pan  [RMB]zoom  [LMB]orbit";
 	controls = mlx_put_string(ctx->mlx, str_c, 100,
 			ft_imax(100, ctx->img->height - 145));
 	if (!controls)
-		(fdf_free(ctx->verts, ctx->tris, ctx), \
-ft_error(ctx->mlx, "ui 3-2", ctx));
+	{
+		fdf_free(ctx->verts, ctx->tris, ctx);
+		ft_error(ctx->mlx, "ui 4", ctx);
+	}
 	controls->instances[0].z = 103;
 }
