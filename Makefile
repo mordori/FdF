@@ -6,7 +6,7 @@
 #    By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/30 16:50:13 by myli-pen          #+#    #+#              #
-#    Updated: 2025/08/07 22:30:43 by myli-pen         ###   ########.fr        #
+#    Updated: 2025/08/22 23:56:58 by myli-pen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -94,7 +94,10 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+relibft:
+	@make -C $(DIR_LIBFT) re
+
+.PHONY: all clean fclean re relibft
 .SECONDARY: $(OBJS) $(DEPS)
 
 -include $(DEPS)

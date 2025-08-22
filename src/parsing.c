@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/16 23:04:16 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/25 00:01:31 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/08/22 23:49:30 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,7 @@ int	parse_map(char *map, t_vector *verts, t_vec2i *rows_cols)
 	int		col;
 
 	fd = open(map, O_RDONLY);
-	if (fd == ERROR)
-		return (close(fd), ERROR);
-	line = get_next_line(fd);
-	if (!line)
+	if (fd == ERROR || get_next_line(fd, &line) != GNL_OK)
 		return (close(fd), ERROR);
 	rows_cols->x = 0;
 	while (line)
@@ -56,7 +53,8 @@ int	parse_map(char *map, t_vector *verts, t_vec2i *rows_cols)
 		rows_cols->x++;
 		rows_cols->y = col;
 		free_parse(line, elements);
-		line = get_next_line(fd);
+		if (get_next_line(fd, &line) == GNL_ERROR)
+			return (close(fd), free_parse(line, elements), ERROR);
 	}
 	return (close(fd), true);
 }

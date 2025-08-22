@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:07:51 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/08/09 01:54:04 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/08/22 22:05:28 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,13 +41,13 @@ void	initialize(char *file, t_context **ctx, mlx_t *mlx, mlx_image_t *img)
 		free(tris);
 		vector_free(verts, NULL);
 		free((*ctx)->z_buf);
-		ft_error(mlx, "verts init || parse map", NULL);
+		ft_error(mlx, "verts init || parse map", *ctx);
 	}
 	if (!vector_init(tris, true) || !make_triangles(tris, rows_cols))
 	{
 		vector_free(verts, tris, NULL);
 		free((*ctx)->z_buf);
-		ft_error(mlx, "tris init/make", NULL);
+		ft_error(mlx, "tris init/make", *ctx);
 	}
 	(*ctx)->verts = verts;
 	(*ctx)->tris = tris;

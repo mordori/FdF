@@ -6,7 +6,7 @@
 /*   By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 20:14:52 by myli-pen          #+#    #+#             */
-/*   Updated: 2025/07/22 16:46:48 by myli-pen         ###   ########.fr       */
+/*   Updated: 2025/08/22 23:46:12 by myli-pen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,31 +28,32 @@ static inline size_t	linelen(const char *buf);
  * @return String from the read line. NULL in case of error, or if there
  * is nothing else to read.
  */
-char	*get_next_line(int fd)
+int	get_next_line(int fd, char **line)
 {
 	static char	buf[BUFFER_SIZE + 1];
-	char		*line;
 	ssize_t		bytes;
 
-	if (fd < 0 || BUFFER_SIZE < 1)
-		return (NULL);
-	line = extract_line(buf);
-	if (buf[0] && !line)
-		return (NULL);
+	if (fd < 0 || BUFFER_SIZE < 1 || !line)
+		return (GNL_ERROR);
+	*line = extract_line(buf);
+	if (buf[0] && !*line)
+		return (GNL_ERROR);
 	while (!ft_strchr(buf, '\n'))
 	{
 		bytes = read(fd, buf, BUFFER_SIZE);
 		if (bytes == ERROR)
-			return (free(line), NULL);
+			return (free(*line), GNL_ERROR);
 		if (bytes == 0)
 			break ;
 		buf[bytes] = '\0';
-		line = join_lines(line, buf);
-		if (!line)
-			return (NULL);
+		*line = join_lines(*line, buf);
+		if (!*line)
+			return (GNL_ERROR);
 	}
 	trimbuf(buf);
-	return (line);
+	if (*line)
+		return (GNL_OK);
+	return (GNL_EOF);
 }
 
 /**
