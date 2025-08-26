@@ -1,4 +1,4 @@
-# FdF (Fil de Fer)
+# FdF
 ## ✨ Features
 Simple wireframe model software renderer with limited file parsing.
 - Implements a software-based geometry pipeline similar to that of modern GPUs
@@ -50,15 +50,17 @@ Possible further improvements:
 
 > [!TIP]
 > ## 🚀 How to use
-- Run the following command to clone the repository and create `fdf` program
+Run the following commands to clone the repository and create `fdf` program
 ``` git
-git clone https://github.com/mordori/fdf.git fdf && cd fdf && make
+git clone https://github.com/mordori/fdf.git fdf
+cd fdf
+make
 ```
-- Execute the program with a map file as a parameter, for example
+Execute the program with a map file as a parameter, for example
 ``` C
 ./fdf maps/test.fdf
 ```
-- To delete all of the compiled files and MLX42, use
+To delete all of the compiled files and MLX42, use
 ``` Makefile
 make fclean
 ```
