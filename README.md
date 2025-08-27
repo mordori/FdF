@@ -1,6 +1,6 @@
 # FdF
 ## ✨ Features
-Simple wireframe model software renderer with limited file parsing.
+**Simple wireframe model software renderer.**
 - Implements a software-based geometry pipeline similar to that of modern GPUs
 - Uses the Liang-Barsky algorithm for line clipping and Bresenham’s algorithm for rasterizing the lines
 - Follows an OpenGL-style right-handed coordinate convention, where Y is up, X is to the right, and in view space the camera looks down -Z
