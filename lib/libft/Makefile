@@ -6,7 +6,7 @@
 #    By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/02 20:19:00 by myli-pen          #+#    #+#              #
-#    Updated: 2025/09/01 20:38:25 by myli-pen         ###   ########.fr        #
+#    Updated: 2025/09/01 21:08:03 by myli-pen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME		=libft.a
 
 CC			=cc
 CFLAGS		=-Wall -Wextra -Werror -Wunreachable-code -O3
-MAKEFLAGS	+= --no-print-directory -j$(shell nproc)
+MAKEFLAGS	+= --no-print-directory
 
 DIR_INC		=inc/
 DIR_SRC		=src/

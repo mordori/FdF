@@ -6,7 +6,7 @@
 #    By: myli-pen <myli-pen@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/30 16:50:13 by myli-pen          #+#    #+#              #
-#    Updated: 2025/09/01 20:39:47 by myli-pen         ###   ########.fr        #
+#    Updated: 2025/09/01 21:01:21 by myli-pen         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ MLX42		=$(DIR_MLX)build/libmlx42.a
 CC			=cc
 CFLAGS		=-Wall -Wextra -Werror -Wunreachable-code -O3
 LDFLAGS		=-ldl -lglfw -pthread -lm
-MAKEFLAGS	+= --no-print-directory
+MAKEFLAGS	+= --no-print-directory -j$(shell nproc)
 
 DIR_LIBFT	=$(DIR_LIB)libft/
 DIR_MLX		=$(DIR_LIB)MLX42/
@@ -53,7 +53,7 @@ $(DIR_OBJ):
 
 $(LIBFT):
 	@echo "$(GREEN) [+]$(COLOR) compiling libft.a"
-	@make -C $(DIR_LIBFT)
+	@+make -C $(DIR_LIBFT)
 
 $(MLX42):
 	@if [ ! -d "$(DIR_MLX)" ]; then \
@@ -62,12 +62,14 @@ $(MLX42):
 	fi
 	@echo "$(GREEN) [+]$(COLOR) compiling mlx42.a"
 	@cmake $(DIR_MLX) -B $(DIR_MLX)build > /dev/null
-	@make -C $(DIR_MLX)build -j4 > /dev/null
+	@+make -C $(DIR_MLX)build > /dev/null
 	@echo "$(YELLOW) [✔] mlx42.a created$(COLOR)"
 
 $(NAME): $(OBJS)
 	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBFT) $(MLX42) $(LDFLAGS)
 	@echo "$(YELLOW) [✔] $(NAME) created$(COLOR)"
+
+$(OBJS): $(MLX42)
 
 $(DIR_OBJ)%.o: $(DIR_SRC)%.c | $(DIR_OBJ)
 	@$(CC) $(CFLAGS) -c $< -o $@ -MMD -MP -MF $(patsubst $(DIR_OBJ)%.o, $(DIR_DEP)%.d, $@) $(HEADERS)
@@ -79,14 +81,14 @@ clean:
 		echo "$(RED) [-]$(COLOR) removed $(DIR_OBJ)"; \
 		echo "$(RED) [-]$(COLOR) removed $(DIR_DEP)"; \
 	fi
-	@make -C $(DIR_LIBFT) clean
+	@+make -C $(DIR_LIBFT) clean
 
 fclean: clean
 	@if [ -d "$(DIR_MLX)" ]; then \
 		rm -rf $(DIR_MLX); \
 		echo "$(RED) [-]$(COLOR) removed $(DIR_MLX)"; \
 	fi
-	@make -C $(DIR_LIBFT) fclean
+	@+make -C $(DIR_LIBFT) fclean
 	@if [ -e "$(NAME)" ]; then \
 		rm -f $(NAME); \
 		echo "$(RED) [-]$(COLOR) removed $(NAME)"; \
@@ -94,10 +96,7 @@ fclean: clean
 
 re: fclean all
 
-relibft:
-	@make -C $(DIR_LIBFT) re
-
-.PHONY: all clean fclean re relibft
+.PHONY: all clean fclean re
 .SECONDARY: $(OBJS) $(DEPS)
 
 -include $(DEPS)
