@@ -7,7 +7,7 @@
 - Includes an orbiting camera controller that emulates the navigation style of 3D modeling software like Blender
 
 <p align="center">
-  <img src="doc/42.gif" alt="Demo" />
+  <img src="https://github.com/mordori/FdF/blob/main/doc/42.gif" alt="Demo" />
 </p>
 
 ## 📖 Introduction
@@ -54,7 +54,7 @@ Run the following commands to clone the repository and create `fdf` program
 ``` git
 git clone https://github.com/mordori/fdf.git fdf
 cd fdf
-make
+make -j4
 ```
 Execute the program with a map file as a parameter, for example
 ``` C
